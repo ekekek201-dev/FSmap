@@ -27,7 +27,8 @@ kakao.maps.event.addListener(map, 'idle', function() {
                 var lng = position.coords.longitude;
                 var locPosition = new kakao.maps.LatLng(lat, lng);
                 
-                map.setCenter(locPosition);
+                map.setCenter(locPosition); // 지도 중심 이동
+                updateMyLocationMarker(lat, lng); // 마커 표시 업데이트
                 window.hasLocated = true; // 위치 이동 완료 플래그
             },
             function(error) {
@@ -47,7 +48,7 @@ var currentMarker = null;
 var currentInfoWindow = null;
 var fishingPointsDataset = []; 
 var tempCoords = ""; 
-
+var myLocationMarker = null; // 내 위치 마커를 담을 변수
 // 수심 숫자 레이어들을 모아둘 메모리 배열
 var depthTextOverlays = []; 
 
@@ -379,4 +380,27 @@ function closeListSidebar() {
 
 function clickMenu(menuName) { 
     alert(menuName + " 메뉴를 클릭하셨습니다!"); 
+}
+
+function updateMyLocationMarker(lat, lng) {
+    var locPosition = new kakao.maps.LatLng(lat, lng);
+    
+    // 마커가 이미 있다면 위치만 수정
+    if (myLocationMarker) {
+        myLocationMarker.setPosition(locPosition);
+    } else {
+        // 마커가 없다면 새로 생성 (파란색 원형 마커 아이콘)
+        var imageSize = new kakao.maps.Size(24, 24);
+        var markerImage = new kakao.maps.MarkerImage(
+            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', // 원하는 마커 이미지 URL
+            imageSize
+        );
+        
+        myLocationMarker = new kakao.maps.Marker({
+            map: map,
+            position: locPosition,
+            image: markerImage,
+            title: "내 위치"
+        });
+    }
 }
