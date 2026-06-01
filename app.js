@@ -36,7 +36,7 @@ kakao.maps.event.addListener(map, 'idle', function() {
             },
             {
                 enableHighAccuracy: true, // 정밀도 높임
-                timeout: 2000,           // 2초 타임아웃
+                timeout: 1000,           // 1초 타임아웃
                 maximumAge: 0
             }
         );
@@ -431,10 +431,10 @@ function moveToCurrentLocation() {
                 loader.classList.remove('show');
                 alert("현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.");
             },
-            { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 1000, maximumAge: 0 }
         );
     } else {
         alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
     }
-    alert("현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.");
+    
 }
