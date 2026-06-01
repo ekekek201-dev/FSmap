@@ -2,7 +2,7 @@
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
 // =================================================================
 // 1. 초기 기본 좌표 변수 설정
-var defaultLat = 35.495;
+var defaultLat = 36.495;
 var defaultLng = 129.445;
 
 var container = document.getElementById('map');
