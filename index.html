@@ -31,16 +31,36 @@
         .crosshair::before { content: ''; position: absolute; top: 14px; left: 0; width: 30px; height: 2px; background: #dc2626; }
         .crosshair::after { content: ''; position: absolute; top: 0; left: 14px; width: 2px; height: 30px; background: #dc2626; }
         .crosshair-dot { position: absolute; top: 12px; left: 12px; width: 6px; height: 6px; background: #dc2626; border-radius: 50%; }
-
-        /* 하단 메뉴 바 스타일 */
+        
+        /* 하단 메뉴 바 스타일 조정 */
         .menu-container {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 10px;          
-            background: rgba(255, 255, 255, 0.9); padding: 10px; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 90%; overflow-x: auto; white-space: nowrap;  
+            position: absolute; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 10; 
+            display: flex; 
+            gap: 6px; /* 10px에서 6px로 줄여서 여유 공간 확보 */
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 8px 12px; /* 패딩을 살짝 줄임 */
+            border-radius: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            max-width: 95%; /* 더 넓게 활용 */
+            overflow-x: auto; 
+            white-space: nowrap;  
         }
-        .menu-btn { background-color: #1e3a8a; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .menu-btn:hover { background-color: #3b82f6; }
-        .menu-btn.active { background-color: #dc2626 !important; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
-
+        
+        .menu-btn { 
+            background-color: #1e3a8a; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; /* 버튼 좌우 패딩을 조금 줄임 */
+            border-radius: 20px; 
+            font-size: 13px; /* 폰트 크기를 살짝 줄여 버튼 4개가 잘 들어가게 함 */
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
         /* 마커 옆에 뜰 입력창 팝업 스타일 */
         .info-form { padding: 10px; font-size: 12px; width: 330px; line-height: 1.6; color: #333; }
         .info-form h4 { margin: 0 0 8px 0; color: #1e3a8a; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
