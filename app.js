@@ -286,6 +286,7 @@ function saveFishingPoint() {
                     <span>기타</span><span style="font-size:11px; color:#666; width:200px; word-break:break-all;">${newPoint.memo}</span>
                 </div>
                 <div style="text-align:right; margin-top:8px;">
+                    <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px; background:#ef4444; color:white;"onclick="deleteFishingPoint(${newPoint.id})">삭제</button>                    
                     <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px;" onclick="currentInfoWindow.close()">닫기</button>
                 </div>
             </div>
@@ -433,5 +434,31 @@ function initMyPosition() {
             },
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
+    }
+}
+function deleteFishingPoint(id) {
+    if (!confirm("이 포인트를 삭제하시겠습니까?")) return;
+
+    // 1. 데이터셋에서 해당 인덱스 찾기
+    var index = fishingPointsDataset.findIndex(function(pt) { return pt.id === id; });
+    if (index === -1) return;
+
+    var pt = fishingPointsDataset[index];
+
+    // 2. 지도에서 마커 제거
+    if (pt.markerRef) {
+        pt.markerRef.setMap(null);
+    }
+
+    // 3. 데이터셋에서 삭제
+    fishingPointsDataset.splice(index, 1);
+
+    // 4. UI 닫기 및 알림
+    if (currentInfoWindow) currentInfoWindow.close();
+    alert("포인트가 삭제되었습니다.");
+    
+    // 리스트 사이드바가 열려있다면 새로고침
+    if (document.getElementById('list-sidebar').classList.contains('open')) {
+        openListSidebar();
     }
 }
