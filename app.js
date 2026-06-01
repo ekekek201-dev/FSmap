@@ -17,19 +17,17 @@ var geocoder = new kakao.maps.services.Geocoder();
 initMyPosition();
 
 
-// 전역 관리 변수들
+// [상단 전역 변수 섹션]
 var isRegisterMode = false;
 var currentMarker = null;
 var currentInfoWindow = null;
 var fishingPointsDataset = []; 
 var tempCoords = ""; 
-var myLocationMarker = null; // 내 위치 마커를 담을 변수
-// 수심 숫자 레이어들을 모아둘 메모리 배열
+var myLocationMarker = null;
 var depthTextOverlays = []; 
-
-// 수심 조회를 위해 클릭 시점의 원본 위경도 좌표 임시 보관소
 var lastClickLat = 0;
 var lastClickLng = 0;
+var hasLocated = false; // 여기 추가!
 
 // =================================================================
 // 🎨 [대표님 기획 지시사항] 어종별 커스텀 이미지 마커 스펙 정의 파트
