@@ -390,7 +390,7 @@ function updateMyLocationMarker(lat, lng) {
         myLocationMarker.setMap(map); // 위치 이동 후 확실하게 지도에 다시 연결
     } else {
         var markerImage = new kakao.maps.MarkerImage(
-            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', 
+            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/mini_circle.png', 
             new kakao.maps.Size(24, 24)
         );
         
