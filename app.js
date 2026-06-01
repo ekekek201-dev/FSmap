@@ -1,15 +1,37 @@
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
 // =================================================================
+// 1. 초기 기본 좌표 변수 설정
+var defaultLat = 35.495;
+var defaultLng = 129.445;
+
 var container = document.getElementById('map');
 var options = {
-    center: new kakao.maps.LatLng(35.495, 129.445), 
+    // 일단 기본 좌표로 지도를 생성합니다.
+    center: new kakao.maps.LatLng(defaultLat, defaultLng), 
     level: 3,
     mapTypeId : kakao.maps.MapTypeId.HYBRID 
 };
 var map = new kakao.maps.Map(container, options);
 var geocoder = new kakao.maps.services.Geocoder();
 
+// 2. 실행 즉시 현재 위치 조회 시도
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var locPosition = new kakao.maps.LatLng(lat, lng);
+            
+            // 성공 시: 지도 중심을 내 위치로 이동
+            map.setCenter(locPosition);
+        },
+        function(error) {
+            // 실패 시: 아무것도 안 하면 위에서 설정한 defaultLat, defaultLng 그대로 유지됨
+            console.log("위치 조회 실패, 기본 좌표를 유지합니다.");
+        }
+    );
+}
 // 전역 관리 변수들
 var isRegisterMode = false;
 var currentMarker = null;
