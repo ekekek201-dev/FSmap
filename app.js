@@ -35,11 +35,12 @@ var hasLocated = false; // 여기 추가!
 // 💡 대표님! 나중에 쏨뱅이, 붉바리 등의 전용 물고기 도안(PNG)이 나오면 아래 URL 주소만 수정하시면 됩니다.
 // 현재는 구분을 위해 시스템에서 제공하는 서로 다른 색상/모양의 마커 아이콘들로 정밀 매핑해 두었습니다.
 var FISH_MARKER_MAP = {
-    "쏨뱅이": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",       // 노란 별 모양
-    "붉바리": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",                        // 구글 레핀
-    "볼락": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",                       // 구글 블루핀
-    "농어": "https://maps.google.com/mapfiles/ms/icons/green-dot.png",                      // 구글 그린핀
-    "기본": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/mini_circle.png"      // 드롭다운 외 직접입력 기본 미니 마커
+    "쏨뱅이": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+    "붉바리": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+    "볼락": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+    "농어": "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+    "기본": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/mini_circle.png",
+    "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png" // 추가
 };
 
 // 마커 사이즈 및 규격 정의
@@ -364,7 +365,7 @@ function updateMyLocationMarker(lat, lng) {
     } else {
         
         var markerImage = new kakao.maps.MarkerImage(
-            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', 
+            FISH_MARKER_MAP["내위치"],
             new kakao.maps.Size(20, 20), 
             { offset: new kakao.maps.Point(10, 20) } 
         );
