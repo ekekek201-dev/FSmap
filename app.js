@@ -436,4 +436,5 @@ function moveToCurrentLocation() {
     } else {
         alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
     }
+    alert("현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.");
 }
