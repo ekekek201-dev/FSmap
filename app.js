@@ -404,3 +404,36 @@ function updateMyLocationMarker(lat, lng) {
         });
     }
 }
+
+// 현재 위치로 지도 중심 이동 및 내 위치 마커 업데이트
+function moveToCurrentLocation() {
+    if (navigator.geolocation) {
+        // 로딩 레이어 표시
+        var loader = document.getElementById('loading-screen');
+        loader.classList.add('show');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var locPosition = new kakao.maps.LatLng(lat, lng);
+                
+                // 지도 중심 이동
+                map.setCenter(locPosition);
+                map.setLevel(3); // 적절한 줌 레벨로 설정
+                
+                // 내 위치 마커 표시/업데이트 (기존 함수 활용)
+                updateMyLocationMarker(lat, lng);
+                
+                loader.classList.remove('show');
+            },
+            function(error) {
+                loader.classList.remove('show');
+                alert("현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.");
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+    } else {
+        alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
+    }
+}
