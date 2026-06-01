@@ -36,7 +36,7 @@ kakao.maps.event.addListener(map, 'idle', function() {
             },
             {
                 enableHighAccuracy: true, // 정밀도 높임
-                timeout: 5000,           // 5초 타임아웃
+                timeout: 2000,           // 2초 타임아웃
                 maximumAge: 0
             }
         );
