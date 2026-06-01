@@ -14,34 +14,9 @@ var options = {
 var map = new kakao.maps.Map(container, options);
 var geocoder = new kakao.maps.services.Geocoder();
 
-// 2. [수정] 지도가 완전히 로딩된 후(idle 상태)에 위치 조회 시도
-// 'idle' 이벤트는 지도 이동, 확대/축소 등 모든 동작이 멈춘 상태를 의미합니다.
-kakao.maps.event.addListener(map, 'idle', function() {
-    // 한 번만 실행되도록 체크
-    if (window.hasLocated) return; 
-    
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                var locPosition = new kakao.maps.LatLng(lat, lng);
-                
-                map.setCenter(locPosition); // 지도 중심 이동
-                updateMyLocationMarker(lat, lng); // 마커 표시 업데이트
-                window.hasLocated = true; // 위치 이동 완료 플래그
-            },
-            function(error) {
-                console.log("위치 조회 실패, 기본 좌표를 유지합니다.");
-            },
-            {
-                enableHighAccuracy: true, // 정밀도 높임
-                timeout: 1000,           // 1초 타임아웃
-                maximumAge: 0
-            }
-        );
-    }
-});
+initMyPosition();
+
+
 // 전역 관리 변수들
 var isRegisterMode = false;
 var currentMarker = null;
@@ -437,4 +412,27 @@ function moveToCurrentLocation() {
         alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
     }
     
+}
+
+// [새로운 방식] 지도 생성 직후 바로 실행되는 초기화 함수
+function initMyPosition() {
+    if (window.hasLocated) return; // 이미 위치를 잡았다면 중복 실행 방지
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var locPosition = new kakao.maps.LatLng(lat, lng);
+                
+                map.setCenter(locPosition);
+                updateMyLocationMarker(lat, lng);
+                window.hasLocated = true; // 플래그 설정
+            },
+            function(error) {
+                console.log("초기 위치 조회 실패, 기본 좌표 사용");
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+    }
 }
