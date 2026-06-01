@@ -387,18 +387,14 @@ function updateMyLocationMarker(lat, lng) {
     
     if (myLocationMarker) {
         myLocationMarker.setPosition(locPosition);
-        myLocationMarker.setMap(map); // 위치 이동 후 확실하게 지도에 다시 연결
+        myLocationMarker.setMap(map);
     } else {
-        var markerImage = new kakao.maps.MarkerImage(
-            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/mini_circle.png', 
-            new kakao.maps.Size(24, 24)
-        );
-        
+        // 이미지를 사용하지 않는 기본 마커로 생성 (오류 발생 가능성 차단)
         myLocationMarker = new kakao.maps.Marker({
-            map: map, // 생성 시점에 지도 연결
+            map: map,
             position: locPosition,
-            image: markerImage,
             title: "내 위치"
         });
     }
+    console.log("마커가 생성(또는 이동)되었습니다. 위치:", lat, lng);
 }
