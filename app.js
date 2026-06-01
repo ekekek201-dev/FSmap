@@ -389,11 +389,11 @@ function updateMyLocationMarker(lat, lng) {
         myLocationMarker.setPosition(locPosition);
         myLocationMarker.setMap(map);
     } else {
-        // 여기서 크기를 40x40으로 키워보세요!
+        
         var markerImage = new kakao.maps.MarkerImage(
             'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', 
-            new kakao.maps.Size(40, 40), 
-            { offset: new kakao.maps.Point(20, 40) } 
+            new kakao.maps.Size(20, 20), 
+            { offset: new kakao.maps.Point(10, 20) } 
         );
 
         myLocationMarker = new kakao.maps.Marker({
