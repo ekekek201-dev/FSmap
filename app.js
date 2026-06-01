@@ -1,37 +1,46 @@
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
-// =================================================================
-// 1. 초기 기본 좌표 변수 설정
+
+// 1. 기본 좌표 설정
 var defaultLat = 36.495;
 var defaultLng = 129.445;
 
 var container = document.getElementById('map');
 var options = {
-    // 일단 기본 좌표로 지도를 생성합니다.
-    center: new kakao.maps.LatLng(defaultLat, defaultLng), 
+    center: new kakao.maps.LatLng(defaultLat, defaultLng),
     level: 3,
     mapTypeId : kakao.maps.MapTypeId.HYBRID 
 };
 var map = new kakao.maps.Map(container, options);
 var geocoder = new kakao.maps.services.Geocoder();
 
-// 2. 실행 즉시 현재 위치 조회 시도
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            var lat = position.coords.latitude;
-            var lng = position.coords.longitude;
-            var locPosition = new kakao.maps.LatLng(lat, lng);
-            
-            // 성공 시: 지도 중심을 내 위치로 이동
-            map.setCenter(locPosition);
-        },
-        function(error) {
-            // 실패 시: 아무것도 안 하면 위에서 설정한 defaultLat, defaultLng 그대로 유지됨
-            console.log("위치 조회 실패, 기본 좌표를 유지합니다.");
-        }
-    );
-}
+// 2. [수정] 지도가 완전히 로딩된 후(idle 상태)에 위치 조회 시도
+// 'idle' 이벤트는 지도 이동, 확대/축소 등 모든 동작이 멈춘 상태를 의미합니다.
+kakao.maps.event.addListener(map, 'idle', function() {
+    // 한 번만 실행되도록 체크
+    if (window.hasLocated) return; 
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var locPosition = new kakao.maps.LatLng(lat, lng);
+                
+                map.setCenter(locPosition);
+                window.hasLocated = true; // 위치 이동 완료 플래그
+            },
+            function(error) {
+                console.log("위치 조회 실패, 기본 좌표를 유지합니다.");
+            },
+            {
+                enableHighAccuracy: true, // 정밀도 높임
+                timeout: 5000,           // 5초 타임아웃
+                maximumAge: 0
+            }
+        );
+    }
+});
 // 전역 관리 변수들
 var isRegisterMode = false;
 var currentMarker = null;
