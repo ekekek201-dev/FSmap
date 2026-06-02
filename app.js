@@ -279,28 +279,42 @@ async function saveFishingPoint() {
             }
         });
     }
-    try{
-      const docRef = await addDoc(collection(db, "fishingPoints"),{
-          id: Date.now(),
-          address: finalAddress,
-          lat: lastClickLat,
-          lng: lastClickLng, 
-          //coords: tempCoords,
-          date: finalDate,
-          time: finalTime,
-          depth: finalDepth + (isNaN(finalDepth) ? "" : " m"), 
-          tide: finalTide || "미입력",
-          temp: finalTemp || "미입력",
-          fish: finalFish,
-          tackle: finalTackle || "미입력",
-          memo: finalMemo || "미입력",
-          markerRef: permanentMarker 
-          });
-          console.log("DB 저장 완료:", docRef.id);
-    } catch (e) {
-      console.error("저장 실패:", e);
-    }
+    var pointData = {
+        address: finalAddress,
+        lat: lastClickLat,
+        lng: lastClickLng,
+        date: finalDate,
+        time: finalTime,
+        depth: finalDepth + (isNaN(finalDepth) ? "" : " m"),
+        tide: finalTide || "미입력",
+        temp: finalTemp || "미입력",
+        fish: finalFish,
+        tackle: finalTackle || "미입력",
+        memo: finalMemo || "미입력",
+        createdAt: new Date()
+    };
 
+    try {
+        const docRef = await addDoc(collection(db, "fishingPoints"), pointData);
+        console.log("Firebase 저장 성공:", docRef.id);
+        
+        // 2. 저장 성공 후, local 리스트에 추가할 객체 생성 (id 포함)
+        var newPoint = { ...pointData, id: docRef.id, markerRef: permanentMarker };
+        fishingPointsDataset.push(newPoint);
+
+        // 3. 이제 마커 클릭 이벤트에 newPoint를 정상적으로 사용 가능
+        kakao.maps.event.addListener(permanentMarker, 'click', function() {
+            // ... (기존 infoWindow 오픈 로직)
+            // 여기서 ${newPoint.address} 등을 마음껏 사용하세요!
+        });
+
+        alert(`${finalFish} 포인트가 성공적으로 등록되었습니다!`);
+
+    } catch (e) {
+        console.error("저장 실패:", e);
+        alert("저장에 실패했습니다.");
+    }
+    
     // 메인 마커 재클릭 이벤트 
     kakao.maps.event.addListener(permanentMarker, 'click', function() {
         if (currentInfoWindow) currentInfoWindow.close();
@@ -495,3 +509,12 @@ function deleteFishingPoint(id) {
         openListSidebar();
     }
 }
+
+window.toggleRegisterMode = toggleRegisterMode;
+window.moveToCurrentLocation = moveToCurrentLocation; // 필요한 함수들을 다 등록하세요
+window.openListSidebar = openListSidebar;
+window.closeListSidebar = closeListSidebar;
+window.clickMenu = clickMenu;
+window.deleteFishingPoint = deleteFishingPoint;
+window.saveFishingPoint = saveFishingPoint;
+window.cancelFishingPoint = cancelFishingPoint;
