@@ -2,7 +2,7 @@
 import { db } from './firebase.js'; 
 import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("2");
+console.log("3");
 
 
 // =================================================================
@@ -514,15 +514,12 @@ function deleteFishingPoint(id) {
     }
 }
 
-window.toggleRegisterMode = toggleRegisterMode;
-window.moveToCurrentLocation = moveToCurrentLocation; // 필요한 함수들을 다 등록하세요
-window.openListSidebar = openListSidebar;
-window.closeListSidebar = closeListSidebar;
-window.clickMenu = clickMenu;
-window.deleteFishingPoint = deleteFishingPoint;
-window.saveFishingPoint = saveFishingPoint;
-window.cancelFishingPoint = cancelFishingPoint;
-window.syncFishDropdown = syncFishDropdown;
-window.currentInfoWindow = currentInfoWindow;
+document.addEventListener('DOMContentLoaded', () => {
+        const pointBtn = document.getElementById('point-btn');
+        if (pointBtn){
+            pointBtn.addEventListener('click',toggleRegisterMode);
+        }
+});
+
 window.currentMarker = currentMarker;
 window.fishingPointsDataset = fishingPointsDataset;
