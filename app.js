@@ -1,4 +1,4 @@
-console.log("버전 2");
+console.log("버전 3");
 
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
@@ -36,6 +36,10 @@ document
 document
     .getElementById("my-loc-btn")
     .addEventListener("click", moveToCurrentLocation);
+
+document
+    .getElementById("my-loc-btn")
+    .addEventListener("click", openListSidebar);
 
 // [상단 전역 변수 섹션]
 var isRegisterMode = false;
