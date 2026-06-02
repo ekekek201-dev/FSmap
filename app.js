@@ -2,6 +2,8 @@
 import { db } from './firebase.js'; 
 import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+console.log("1");
+
 
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
@@ -33,11 +35,6 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 initMyPosition();
 
 
-// app.js 맨 아래 혹은 초기화 로직 근처
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("1");
-    // 여기에 초기화 관련 코드들을 실행하면 더 안전합니다.
-});
 
 
 // [상단 전역 변수 섹션]
