@@ -2,7 +2,7 @@
 import { db } from './firebase.js'; 
 import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("3");
+console.log("4");
 
 
 // =================================================================
@@ -515,9 +515,9 @@ function deleteFishingPoint(id) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-        const pointBtn = document.getElementById('point-btn');
-        if (pointBtn){
-            pointBtn.addEventListener('click',toggleRegisterMode);
+        const regBtn = document.getElementById('reg-btn');
+        if (regBtn){
+            regBtn.addEventListener('click',toggleRegisterMode);
         }
 });
 
