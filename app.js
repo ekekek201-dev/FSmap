@@ -155,7 +155,7 @@ kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
                     <span>어종</span>
                     <div class="fish-combo-box">
                         <input type="text" id="p-fish" placeholder="어종을 입력하거나 선택하세요.">
-                        <select id="p-fish-select" onchange="syncFishDropdown()">
+                        <select id="p-fish-select">
                             <option value="">직접입력</option>
                             <option value="쏨뱅이">쏨뱅이</option>
                             <option value="붉바리">붉바리</option>
@@ -168,14 +168,25 @@ kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
                 <div class="info-row"><span>태클</span><input type="text" id="p-tackle" placeholder="채비 입력"></div>
                 <div class="info-row"><span>기타</span><input type="text" id="p-memo" placeholder="기타 메모"></div>
                 <div class="btn-group">
-                    <button class="form-btn btn-submit" onclick="saveFishingPoint()">등록</button>
-                    <button class="form-btn btn-cancel" onclick="cancelFishingPoint()">취소</button>
+                    <button id = "pop-save-btn" class="form-btn btn-submit">등록</button>
+                    <button id="pop-cancel-btn" class="form-btn btn-cancel">취소</button>
                 </div>
             </div>
         `;
 
         currentInfoWindow = new kakao.maps.InfoWindow({ content: formContent, removable: false });
         currentInfoWindow.open(map, currentMarker);
+        setTimeout(() => {
+            document
+                .getElementById("p-fish-select")
+                ?.addEventListener("change", syncFishDropdown);
+            document
+                .getElementById("pop-save-btn")
+                ?.addEventListener("click",saveFishingPoint);
+            document
+                .getElementById("pop-cancel-btn")
+                ?.addEventListener("click",cancelFishingPoint);
+        },0);
     });
 
     toggleRegisterMode();
