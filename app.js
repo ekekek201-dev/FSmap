@@ -29,6 +29,9 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 
 initMyPosition();
 
+document
+    .getElementById("reg-btn")
+    .addEventListener("click", toggleRegisterMode);
 
 // [상단 전역 변수 섹션]
 var isRegisterMode = false;
