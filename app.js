@@ -2,7 +2,7 @@
 import { db } from './firebase.js'; 
 import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("1");
+console.log("2");
 
 
 // =================================================================
@@ -318,7 +318,7 @@ async function saveFishingPoint() {
         console.error("저장 실패:", e);
         alert("저장에 실패했습니다.");
     }
-    
+}
     // 메인 마커 재클릭 이벤트 
     kakao.maps.event.addListener(permanentMarker, 'click', function() {
         if (currentInfoWindow) currentInfoWindow.close();
@@ -355,7 +355,7 @@ async function saveFishingPoint() {
     if(!isDepthCheckSelect) {
         alert(`${finalFish} 포인트가 성공적으로 등록되었습니다!`);
     }
-}
+
 
 function cancelFishingPoint() {
     if (currentInfoWindow) currentInfoWindow.close();
