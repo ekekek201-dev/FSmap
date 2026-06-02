@@ -1,3 +1,8 @@
+// 파이어베이스 불러오
+import { db } from './firebase.js'; 
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
 
