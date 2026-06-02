@@ -231,7 +231,8 @@ function saveFishingPoint() {
             loader.classList.remove('show'); //로딩완료
             
             if (depthResponse.success && depthResponse.rawItems && depthResponse.rawItems.length > 0) {
-                finalDepth =depthResponse.distMeter; //가장 가까운곳의 수심                
+                
+                newPoint.depth = depthResponse.distMeter + " m";
                 
                 let addedCount = 0;               
                 
