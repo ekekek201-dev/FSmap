@@ -17,7 +17,7 @@ var geocoder = new kakao.maps.services.Geocoder();
 // 지도의 줌 레벨이 변경될 때마다 실행
 kakao.maps.event.addListener(map, 'zoom_changed', function() {
     var level = map.getLevel(); 
-    var SHOW_LEVEL = 5; // 레벨 이하(확대)일 때만 수심 숫자가 보임
+    var SHOW_LEVEL = 4; // 레벨 이하(확대)일 때만 수심 숫자가 보임
 
     depthTextOverlays.forEach(function(overlay) {
         // 현재 레벨이 8보다 크면(축소) null을 주어 숨기고, 작으면 map을 주어 표시
