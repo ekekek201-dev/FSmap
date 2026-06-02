@@ -518,3 +518,7 @@ window.clickMenu = clickMenu;
 window.deleteFishingPoint = deleteFishingPoint;
 window.saveFishingPoint = saveFishingPoint;
 window.cancelFishingPoint = cancelFishingPoint;
+window.syncFishDropdown = syncFishDropdown;
+window.currentInfoWindow = currentInfoWindow;
+window.currentMarker = currentMarker;
+window.fishingPointsDataset = fishingPointsDataset;
