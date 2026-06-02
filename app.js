@@ -232,8 +232,8 @@ function saveFishingPoint() {
             
             if (depthResponse.success && depthResponse.rawItems && depthResponse.rawItems.length > 0) {
                 
-                newPoint.depth = depthResponse.distMeter + " m";
-                console.log("API 응답 데이터:", depthResponse.distMeter);
+                newPoint.depth = depthResponse.depth + " m";
+                console.log("API 응답 데이터:", depthResponse.depth);
                 console.log("newpoint 데이터:", newPoint.depth);
                 let addedCount = 0;               
                 
