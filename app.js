@@ -4,17 +4,17 @@ console.log("버전 6");
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
 
 // 1. 기본 좌표 설정
-var defaultLat = 36.495;
-var defaultLng = 129.445;
+const defaultLat = 36.495;
+const defaultLng = 129.445;
 
-var container = document.getElementById('map');
-var options = {
+const container = document.getElementById('map');
+const options = {
     center: new kakao.maps.LatLng(defaultLat, defaultLng),
     level: 3,
     mapTypeId : kakao.maps.MapTypeId.HYBRID 
 };
-var map = new kakao.maps.Map(container, options);
-var geocoder = new kakao.maps.services.Geocoder();
+const map = new kakao.maps.Map(container, options);
+const geocoder = new kakao.maps.services.Geocoder();
 
 // 지도의 줌 레벨이 변경될 때마다 실행
 kakao.maps.event.addListener(map, 'zoom_changed', function() {
@@ -46,24 +46,24 @@ document
     .addEventListener("click", closeListSidebar);
 
 // [상단 전역 변수 섹션]
-var isRegisterMode = false;
-var currentMarker = null;
-var currentInfoWindow = null;
-var fishingPointsDataset = []; 
-var tempCoords = ""; 
-var myLocationMarker = null;
-var depthTextOverlays = []; 
-var lastClickLat = 0;
-var lastClickLng = 0;
-var hasLocated = false; // 여기 추가!
-var latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
+let isRegisterMode = false;
+let currentMarker = null;
+let currentInfoWindow = null;
+const fishingPointsDataset = []; 
+let tempCoords = ""; 
+let myLocationMarker = null;
+const depthTextOverlays = []; 
+let lastClickLat = 0;
+let lastClickLng = 0;
+let hasLocated = false; // 여기 추가!
+let latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
 
 // =================================================================
 // 🎨 [대표님 기획 지시사항] 어종별 커스텀 이미지 마커 스펙 정의 파트
 // =================================================================
 // 💡 대표님! 나중에 쏨뱅이, 붉바리 등의 전용 물고기 도안(PNG)이 나오면 아래 URL 주소만 수정하시면 됩니다.
 // 현재는 구분을 위해 시스템에서 제공하는 서로 다른 색상/모양의 마커 아이콘들로 정밀 매핑해 두었습니다.
-var FISH_MARKER_MAP = {
+const FISH_MARKER_MAP = {
     "쏨뱅이": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
     "붉바리": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
     "볼락": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
@@ -73,10 +73,10 @@ var FISH_MARKER_MAP = {
 };
 
 // 마커 사이즈 및 규격 정의
-var MARKER_WIDTH = 24;
-var MARKER_HEIGHT = 35;
-var OFFSET_X = 12;
-var OFFSET_Y = 35;
+const MARKER_WIDTH = 24;
+const MARKER_HEIGHT = 35;
+const OFFSET_X = 12;
+const OFFSET_Y = 35;
 
 // =================================================================
 // 📍 포인트 등록 모드 토글 함수
