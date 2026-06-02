@@ -1,4 +1,4 @@
-console.log("버전 5");
+console.log("버전 6");
 
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
@@ -336,8 +336,8 @@ function saveFishingPoint() {
                     <span>기타</span><span style="font-size:11px; color:#666; width:200px; word-break:break-all;">${newPoint.memo}</span>
                 </div>
                 <div style="text-align:right; margin-top:8px;">
-                    <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px; background:#ef4444; color:white;"onclick="deleteFishingPoint(${newPoint.id})">삭제</button>                    
-                    <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px;" onclick="currentInfoWindow.close()">닫기</button>
+                    <button class="form-btn btn-cancel delete-btn" style="padding:2px 8px; font-size:10px; background:#ef4444; color:white;" data-id="${newPoint.id}">삭제</button>                    
+                    <button class="form-btn btn-cancel close-btn" style="padding:2px 8px; font-size:10px;">닫기</button>
                 </div>
             </div>
         `;
@@ -345,6 +345,19 @@ function saveFishingPoint() {
         map.panTo(permanentMarker.getPosition());
         currentInfoWindow = new kakao.maps.InfoWindow({ content: detailContent, removable: false });
         currentInfoWindow.open(map, permanentMarker);
+        setTimeout(() => {
+        document
+            .querySelector(".delete-btn")
+            ?.addEventListener("click", () => {
+                deleteFishingPoint(newPoint.id);
+            });
+    
+        document
+            .querySelector(".close-btn")
+            ?.addEventListener("click", () => {
+                currentInfoWindow.close();
+            });
+        }, 0);
     });
 
     fishingPointsDataset.push(newPoint);
