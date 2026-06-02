@@ -178,5 +178,27 @@
             }
         }
     </script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+  // 여기에 아까 복사한 본인의 config를 넣으세요!
+  const firebaseConfig = {
+      apiKey: "AIzaSyA7qpdE_c4GyqN5RJ8DApGI4yR2KYmxoeE",
+      authDomain: "fsmap-c9846.firebaseapp.com",
+      projectId: "fsmap-c9846",
+      storageBucket: "fsmap-c9846.firebasestorage.app",
+      messagingSenderId: "872680368099",
+      appId: "1:872680368099:web:d8d77729774f2183ed22d6",
+      measurementId: "G-1W1ZW1P1L8"
+    };
+
+
+  // 파이어베이스 초기화
+  const app = initializeApp(firebaseConfig);
+  export const db = getFirestore(app);
+
+  console.log("Firebase 연결 성공!");
+</script>
 </body>
 </html>
