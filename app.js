@@ -1,5 +1,19 @@
 console.log("버전 8");
 
+
+// [상단 전역 변수 섹션]
+let isRegisterMode = false;
+let currentMarker = null;
+let currentInfoWindow = null;
+const fishingPointsDataset = []; 
+let tempCoords = ""; 
+let myLocationMarker = null;
+const depthTextOverlays = []; 
+let lastClickLat = 0;
+let lastClickLng = 0;
+let hasLocated = false; // 여기 추가!
+let latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
+
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
 
@@ -13,6 +27,7 @@ const options = {
     level: 3,
     mapTypeId : kakao.maps.MapTypeId.HYBRID 
 };
+
 const map = new kakao.maps.Map(container, options);
 const geocoder = new kakao.maps.services.Geocoder();
 
@@ -45,18 +60,7 @@ document
     .getElementById("list-close-btn")
     .addEventListener("click", closeListSidebar);
 
-// [상단 전역 변수 섹션]
-let isRegisterMode = false;
-let currentMarker = null;
-let currentInfoWindow = null;
-const fishingPointsDataset = []; 
-let tempCoords = ""; 
-let myLocationMarker = null;
-const depthTextOverlays = []; 
-let lastClickLat = 0;
-let lastClickLng = 0;
-let hasLocated = false; // 여기 추가!
-let latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
+
 
 // =================================================================
 // 🎨 [대표님 기획 지시사항] 어종별 커스텀 이미지 마커 스펙 정의 파트
