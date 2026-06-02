@@ -225,33 +225,35 @@ function saveFishingPoint() {
     // 지능형 수심 숫자 누적 맵핑 로직
     if (isDepthCheckSelect) {
         var loader = document.getElementById('loading-screen');
-        loader.classList.add('show'); 
+        loader.classList.add('show'); //로딩중
 
-        getOceanDepthData(lastClickLat, lastClickLng, function(depthResponse) {
-            loader.classList.remove('show'); 
-
+        getOceanDepthData(lastClickLat, lastClickLng, function(depthResponse) { //수심api호출
+            loader.classList.remove('show'); //로딩완료
+            
             if (depthResponse.success && depthResponse.rawItems && depthResponse.rawItems.length > 0) {
-                let addedCount = 0; 
-
-                depthResponse.rawItems.forEach(function(pt) {
-                    var targetKey = `${parseFloat(pt.lat).toFixed(5)},${parseFloat(pt.lng).toFixed(5)}`;
-                    var isAlreadyExists = depthTextOverlays.some(function(existingOverlay) {
+                finalDepth =depthResponse.distMeter; //가장 가까운곳의 수심                
+                
+                let addedCount = 0;               
+                
+                depthResponse.rawItems.forEach(function(pt) { //foreach는 반복문
+                    var targetKey = `${parseFloat(pt.lat).toFixed(5)},${parseFloat(pt.lng).toFixed(5)}`; //중복확인용키생성
+                    var isAlreadyExists = depthTextOverlays.some(function(existingOverlay) { //중복확인depthTextOverlays
                         var pos = existingOverlay.getPosition();
                         return `${pos.getLat().toFixed(5)},${pos.getLng().toFixed(5)}` === targetKey;
                     });
 
-                    if (isAlreadyExists) return; 
+                    if (isAlreadyExists) return; //중복시 리턴
 
                     var numLatLng = new kakao.maps.LatLng(pt.lat, pt.lng);
-                    var cleanNum = pt.dpwt.replace(" m", "");
+                    var cleanNum = pt.dpwt.replace(" m", ""); //m 삭제
                     var customOverlayContent = `<div class="sea-depth-number">${cleanNum}</div>`;
                     
-                    // [수정 추천] saveFishingPoint 함수 내 
+                    
                     var depthTextOverlay = new kakao.maps.CustomOverlay({
                         position: numLatLng,
                         content: customOverlayContent,
-                        yAnchor: 0.5, // 오타 수정 (yyanchor -> yAnchor)
-                        xAnchor: 0.5  // 오타 수정 (xxanchor -> xAnchor)
+                        yAnchor: 0.5, // 
+                        xAnchor: 0.5  //
                     });
                     
                     // 📌 [추가] 생성 시점에 현재 줌 레벨을 체크하여 표시/숨김 처리
