@@ -14,6 +14,17 @@ var options = {
 var map = new kakao.maps.Map(container, options);
 var geocoder = new kakao.maps.services.Geocoder();
 
+// 지도의 줌 레벨이 변경될 때마다 실행
+kakao.maps.event.addListener(map, 'zoom_changed', function() {
+    var level = map.getLevel(); 
+    var SHOW_LEVEL = 8; // 8레벨 이하(확대)일 때만 수심 숫자가 보임
+
+    depthTextOverlays.forEach(function(overlay) {
+        // 현재 레벨이 8보다 크면(축소) null을 주어 숨기고, 작으면 map을 주어 표시
+        overlay.setMap(level <= SHOW_LEVEL ? map : null);
+    });
+});
+
 initMyPosition();
 
 
@@ -234,16 +245,22 @@ function saveFishingPoint() {
                     var cleanNum = pt.dpwt.replace(" m", "");
                     var customOverlayContent = `<div class="sea-depth-number">${cleanNum}</div>`;
                     
+                    // [수정 추천] saveFishingPoint 함수 내 
                     var depthTextOverlay = new kakao.maps.CustomOverlay({
                         position: numLatLng,
                         content: customOverlayContent,
-                        yyanchor: 0.5,
-                        xxanchor: 0.5
+                        yAnchor: 0.5, // 오타 수정 (yyanchor -> yAnchor)
+                        xAnchor: 0.5  // 오타 수정 (xxanchor -> xAnchor)
                     });
-
-                    depthTextOverlay.setMap(map);
-                    depthTextOverlays.push(depthTextOverlay); 
-                    addedCount++;
+                    
+                    // 📌 [추가] 생성 시점에 현재 줌 레벨을 체크하여 표시/숨김 처리
+                    var currentLevel = map.getLevel();
+                    var SHOW_LEVEL = 8;
+                    depthTextOverlay.setMap(currentLevel <= SHOW_LEVEL ? map : null);
+                                        
+                    // 배열에 담기
+                        depthTextOverlays.push(depthTextOverlay); 
+                        addedCount++;
                 });
                 
                 if (addedCount > 0) {
