@@ -39,6 +39,7 @@ var depthTextOverlays = [];
 var lastClickLat = 0;
 var lastClickLng = 0;
 var hasLocated = false; // 여기 추가!
+var latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
 
 // =================================================================
 // 🎨 [대표님 기획 지시사항] 어종별 커스텀 이미지 마커 스펙 정의 파트
