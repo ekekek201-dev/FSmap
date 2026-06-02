@@ -182,142 +182,117 @@ function syncFishDropdown() {
     }
 }
 
+
+// [핵심 1] 마커 클릭 이벤트만 따로 관리하는 함수 (전역/파일 스코프에 배치)
+function setupMarkerClickEvent(marker, pointData) {
+    kakao.maps.event.addListener(marker, 'click', function() {
+        if (currentInfoWindow) currentInfoWindow.close();
+
+        // 여기서 detailContent를 생성 (newPoint 대신 매개변수로 받은 pointData 사용)
+        var detailContent = `
+            <div class="info-form" style="padding:12px; width:280px;">
+                <h4 style="margin:0 0 8px 0; color:#dc2626; border-bottom:2px solid #dc2626;">📌 등록된 포인트 상세</h4>
+                <div class="info-row"><span>장소</span><span style="font-size:11px; color:#333;">${pointData.address}</span></div>
+                <div class="info-row"><span>좌표</span><span style="font-size:11px; color:#007BFF;">${pointData.lat.toFixed(4)}, ${pointData.lng.toFixed(4)}</span></div>
+                <div class="info-row"><span>어종</span><span style="font-size:12px; color:#e11d48; font-weight:bold;">🐟 ${pointData.fish}</span></div>
+                <div class="info-row"><span>수심</span><span style="font-size:12px; color:#007BFF; font-weight:bold;">${pointData.depth}</span></div>
+                <div class="info-row"><span>날짜</span><span style="font-size:11px; color:#333;">${pointData.date} ${pointData.time}</span></div>
+                <div class="info-row"><span>물때/수온</span><span style="font-size:11px; color:#1e3a8a;">${pointData.tide} / ${pointData.temp}℃</span></div>
+                <div class="info-row"><span>태클</span><span style="font-size:11px; color:#555;">${pointData.tackle}</span></div>
+                <div class="info-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:4px;">
+                    <span>기타</span><span style="font-size:11px; color:#666; width:200px; word-break:break-all;">${pointData.memo}</span>
+                </div>
+                <div style="text-align:right; margin-top:8px;">
+                    <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px; background:#ef4444; color:white;" onclick="deleteFishingPoint('${pointData.id}')">삭제</button>
+                    <button class="form-btn btn-cancel" style="padding:2px 8px; font-size:10px;" onclick="currentInfoWindow.close()">닫기</button>
+                </div>
+            </div>
+        `;
+        
+        map.panTo(marker.getPosition());
+        currentInfoWindow = new kakao.maps.InfoWindow({ content: detailContent, removable: false });
+        currentInfoWindow.open(map, marker);
+    });
+}
+
+
 // =================================================================
 // 💾 데이터 세이브 및 [지능형 수심 숫자 누적 + 🐟어종 마커 가공] 엔진
 // =================================================================
 async function saveFishingPoint() {
-    var finalAddress = document.getElementById('p-pos').value; 
-    var finalDate    = document.getElementById('p-date').value; 
-    var finalTime    = document.getElementById('p-time').value; 
-    var finalDepth   = document.getElementById('p-depth').value || "미입력"; 
-    var finalTide    = document.getElementById('p-tide').value; 
-    var finalTemp    = document.getElementById('p-temp-real').value; 
-    var finalFish    = document.getElementById('p-fish').value || "미입력"; // 입력받은 최종 어종 텍스트
-    var finalTackle  = document.getElementById('p-tackle').value; 
-    var finalMemo    = document.getElementById('p-memo').value; 
+    // 1. 데이터 수집
+    var pointData = {
+        address: document.getElementById('p-pos').value,
+        lat: lastClickLat,
+        lng: lastClickLng,
+        date: document.getElementById('p-date').value,
+        time: document.getElementById('p-time').value,
+        depth: document.getElementById('p-depth').value || "미입력",
+        tide: document.getElementById('p-tide').value || "미입력",
+        temp: document.getElementById('p-temp-real').value || "미입력",
+        fish: document.getElementById('p-fish').value || "미입력",
+        tackle: document.getElementById('p-tackle').value || "미입력",
+        memo: document.getElementById('p-memo').value || "미입력",
+        createdAt: new Date()
+    };
     
     var isDepthCheckSelect = document.getElementById('p-depth-check').checked;
 
-    if (currentInfoWindow) currentInfoWindow.close();
-    if (currentMarker) currentMarker.setMap(null);
-
-    // 🌟 [대표님 지시 핵심 로직: 어종 식별 및 마커 이미지 분기 처리]
-    var markerImageUrl = FISH_MARKER_MAP["기본"]; // 매칭 없으면 기본 미니점으로 세팅
-    var currentWidth = 10;
-    var currentHeight = 10;
-    var currentOffsetX = 5;
-    var currentOffsetY = 5;
-
-    // 만약 사용자가 지정한 4대 어종 이름이 포함되어 있다면 해당 마커 이미지로 전격 변신!
-    if (FISH_MARKER_MAP[finalFish]) {
-        markerImageUrl = FISH_MARKER_MAP[finalFish];
-        currentWidth = MARKER_WIDTH;
-        currentHeight = MARKER_HEIGHT;
-        currentOffsetX = OFFSET_X;
-        currentOffsetY = OFFSET_Y;
-    }
-
+    // 2. 마커 생성
+    var markerImageUrl = FISH_MARKER_MAP[pointData.fish] || FISH_MARKER_MAP["기본"];
     var appMarkerImage = new kakao.maps.MarkerImage(
         markerImageUrl, 
-        new kakao.maps.Size(currentWidth, currentHeight), 
-        { offset: new kakao.maps.Point(currentOffsetX, currentOffsetY) }
+        new kakao.maps.Size(MARKER_WIDTH, MARKER_HEIGHT), 
+        { offset: new kakao.maps.Point(OFFSET_X, OFFSET_Y) }
     );
 
-    var fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng);
     var permanentMarker = new kakao.maps.Marker({
-        position: fixLatLng,
-        image: appMarkerImage, // 어종별 디자인 옷 최종 착용!
-        clickable: true 
+        position: new kakao.maps.LatLng(pointData.lat, pointData.lng),
+        image: appMarkerImage,
+        clickable: true
     });
     permanentMarker.setMap(map);
 
-    // 지능형 수심 숫자 누적 맵핑 로직
+    // 3. [핵심] 수심 데이터 API 호출 및 오버레이 생성
     if (isDepthCheckSelect) {
         var loader = document.getElementById('loading-screen');
-        loader.classList.add('show'); //로딩중
+        loader.classList.add('show');
 
-        getOceanDepthData(lastClickLat, lastClickLng, function(depthResponse) { //수심api호출
-            loader.classList.remove('show'); //로딩완료
-            
-            if (depthResponse.success && depthResponse.rawItems && depthResponse.rawItems.length > 0) {
-                
-                newPoint.depth = depthResponse.depth + " m";
-                console.log("API 응답 데이터:", depthResponse.distMeter);
-                console.log("API 응답 데이터:", newPoint.depth);
-                let addedCount = 0;               
-                
-                depthResponse.rawItems.forEach(function(pt) { //foreach는 반복문
-                    var targetKey = `${parseFloat(pt.lat).toFixed(5)},${parseFloat(pt.lng).toFixed(5)}`; //중복확인용키생성
-                    var isAlreadyExists = depthTextOverlays.some(function(existingOverlay) { //중복확인depthTextOverlays
-                        var pos = existingOverlay.getPosition();
-                        return `${pos.getLat().toFixed(5)},${pos.getLng().toFixed(5)}` === targetKey;
-                    });
-
-                    if (isAlreadyExists) return; //중복시 리턴
-
+        getOceanDepthData(pointData.lat, pointData.lng, function(depthResponse) {
+            loader.classList.remove('show');
+            if (depthResponse.success && depthResponse.rawItems) {
+                depthResponse.rawItems.forEach(function(pt) {
                     var numLatLng = new kakao.maps.LatLng(pt.lat, pt.lng);
-                    var cleanNum = pt.dpwt.replace(" m", ""); //m 삭제
-                    var customOverlayContent = `<div class="sea-depth-number">${cleanNum}</div>`;
-                    
-                    
                     var depthTextOverlay = new kakao.maps.CustomOverlay({
                         position: numLatLng,
-                        content: customOverlayContent,
-                        yAnchor: 0.5, // 
-                        xAnchor: 0.5  //
+                        content: `<div class="sea-depth-number">${pt.dpwt.replace(" m", "")}</div>`,
+                        yAnchor: 0.5,
+                        xAnchor: 0.5
                     });
-                    
-                    // 📌 [추가] 생성 시점에 현재 줌 레벨을 체크하여 표시/숨김 처리
-                    var currentLevel = map.getLevel();
-                    var SHOW_LEVEL = 8;
-                    depthTextOverlay.setMap(currentLevel <= SHOW_LEVEL ? map : null);
-                                        
-                    // 배열에 담기
-                        depthTextOverlays.push(depthTextOverlay); 
-                        addedCount++;
+                    depthTextOverlay.setMap(map.getLevel() <= 8 ? map : null);
+                    depthTextOverlays.push(depthTextOverlay);
                 });
-                
-                if (addedCount > 0) {
-                    alert(`주변에 새로운 수심 데이터 ${addedCount}개가 누적 맵핑되었습니다!`);
-                }
             }
         });
     }
-    var pointData = {
-        address: finalAddress,
-        lat: lastClickLat,
-        lng: lastClickLng,
-        date: finalDate,
-        time: finalTime,
-        depth: finalDepth + (isNaN(finalDepth) ? "" : " m"),
-        tide: finalTide || "미입력",
-        temp: finalTemp || "미입력",
-        fish: finalFish,
-        tackle: finalTackle || "미입력",
-        memo: finalMemo || "미입력",
-        createdAt: new Date()
-    };
 
+    // 4. Firebase 저장 및 클릭 이벤트 연결
     try {
         const docRef = await addDoc(collection(db, "fishingPoints"), pointData);
-        console.log("Firebase 저장 성공:", docRef.id);
-        
-        // 2. 저장 성공 후, local 리스트에 추가할 객체 생성 (id 포함)
-        var newPoint = { ...pointData, id: docRef.id, markerRef: permanentMarker };
+        const newPoint = { ...pointData, id: docRef.id, markerRef: permanentMarker };
         fishingPointsDataset.push(newPoint);
 
-        // 3. 이제 마커 클릭 이벤트에 newPoint를 정상적으로 사용 가능
-        kakao.maps.event.addListener(permanentMarker, 'click', function() {
-            // ... (기존 infoWindow 오픈 로직)
-            // 여기서 ${newPoint.address} 등을 마음껏 사용하세요!
-        });
-
-        alert(`${finalFish} 포인트가 성공적으로 등록되었습니다!`);
-
+        setupMarkerClickEvent(permanentMarker, newPoint);
+        alert(`${pointData.fish} 포인트가 등록되었습니다!`);
     } catch (e) {
-        console.error("저장 실패:", e);
-        alert("저장에 실패했습니다.");
+        console.error("저장 실패", e);
+        permanentMarker.setMap(null);
     }
+
+    // 5. 뒷정리
+    if (currentInfoWindow) currentInfoWindow.close();
+    if (currentMarker) currentMarker.setMap(null);
+    currentMarker = null;
 }
     // 메인 마커 재클릭 이벤트 
     kakao.maps.event.addListener(permanentMarker, 'click', function() {
