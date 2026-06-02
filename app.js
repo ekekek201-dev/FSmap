@@ -32,6 +32,7 @@ initMyPosition();
 document
     .getElementById("reg-btn")
     .addEventListener("click", toggleRegisterMode);
+console.log("reg-btn 연결 완료");
 
 // [상단 전역 변수 섹션]
 var isRegisterMode = false;
