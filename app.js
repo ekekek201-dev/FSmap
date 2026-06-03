@@ -1,4 +1,14 @@
-console.log("버전 8");
+import { db } from './firebase.js';
+
+import {
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+console.log("버전 9");
 
 
 // [상단 전역 변수 섹션]
@@ -34,7 +44,7 @@ const geocoder = new kakao.maps.services.Geocoder();
 // 지도의 줌 레벨이 변경될 때마다 실행
 kakao.maps.event.addListener(map, 'zoom_changed', function() {
     const level = map.getLevel(); 
-    const SHOW_LEVEL = 4; // 레벨 이하(확대)일 때만 수심 숫자가 보임
+    const SHOW_LEVEL = 8; // 레벨 이하(확대)일 때만 수심 숫자가 보임
 
     depthTextOverlays.forEach(function(overlay) {
         // 현재 레벨이 8보다 크면(축소) null을 주어 숨기고, 작으면 map을 주어 표시
@@ -43,6 +53,7 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 });
 
 initMyPosition();
+loadFishingPointsFromFirebase();
 
 document
     .getElementById("reg-btn")
@@ -59,6 +70,9 @@ document
 document
     .getElementById("list-close-btn")
     .addEventListener("click", closeListSidebar);
+
+
+
 
 
 
@@ -128,7 +142,7 @@ kakao.maps.event.addListener(map, 'click', function() {
     });
     currentMarker.setMap(map);
 
-    tempCoords = `${lastClickLat.toFixed(4)}, ${lastClickLng.toFixed(4)}`;
+    tempCoords = `${lastClickLat.toFixed(5)}, ${lastClickLng.toFixed(5)}`;
 
     const now = new Date();
     const currentDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
@@ -206,67 +220,110 @@ function syncFishDropdown() {
 }
 
 // =================================================================
-// 💾 데이터 세이브 및 [지능형 수심 숫자 누적 + 🐟어종 마커 가공] 엔진
-// =================================================================
-function saveFishingPoint() {
-    const finalAddress = document.getElementById('p-pos').value; 
-    const finalDate    = document.getElementById('p-date').value; 
-    const finalTime    = document.getElementById('p-time').value; 
-    const finalDepth   = document.getElementById('p-depth').value || "미입력"; 
-    const finalTide    = document.getElementById('p-tide').value; 
-    const finalTemp    = document.getElementById('p-temp-real').value; 
-    const finalFish    = document.getElementById('p-fish').value || "미입력"; // 입력받은 최종 어종 텍스트
-    const finalTackle  = document.getElementById('p-tackle').value; 
-    const finalMemo    = document.getElementById('p-memo').value; 
-    
-    const isDepthCheckSelect = document.getElementById('p-depth-check').checked;
+function getFormData() {
+    return {
+        address: document.getElementById('p-pos').value,
+        date: document.getElementById('p-date').value,
+        time: document.getElementById('p-time').value,
 
-    if (currentInfoWindow) currentInfoWindow.close();
-    if (currentMarker) currentMarker.setMap(null);
+        depth: document.getElementById('p-depth').value,
+        tide: document.getElementById('p-tide').value,
+        temp: document.getElementById('p-temp-real').value,
 
-    // 🌟 [대표님 지시 핵심 로직: 어종 식별 및 마커 이미지 분기 처리]
-    let markerImageUrl = FISH_MARKER_MAP["기본"]; // 매칭 없으면 기본 미니점으로 세팅
-    let currentWidth = 10;
-    let currentHeight = 10;
-    let currentOffsetX = 5;
-    let currentOffsetY = 5;
+        fish: document.getElementById('p-fish').value || "미입력",
+        tackle: document.getElementById('p-tackle').value,
+        memo: document.getElementById('p-memo').value,
 
-    // 만약 사용자가 지정한 4대 어종 이름이 포함되어 있다면 해당 마커 이미지로 전격 변신!
-    if (FISH_MARKER_MAP[finalFish]) {
-        markerImageUrl = FISH_MARKER_MAP[finalFish];
-        currentWidth = MARKER_WIDTH;
-        currentHeight = MARKER_HEIGHT;
-        currentOffsetX = OFFSET_X;
-        currentOffsetY = OFFSET_Y;
+        useDepthApi: document.getElementById('p-depth-check').checked
+    };
+}
+
+function createFishingMarker(fishName, position) {
+    let markerImageUrl = FISH_MARKER_MAP["기본"];
+    let width = 10;
+    let height = 10;
+    let offsetX = 5;
+    let offsetY = 5;
+
+    if (FISH_MARKER_MAP[fishName]) {
+        markerImageUrl = FISH_MARKER_MAP[fishName];
+        width = MARKER_WIDTH;
+        height = MARKER_HEIGHT;
+        offsetX = OFFSET_X;
+        offsetY = OFFSET_Y;
     }
 
-    const appMarkerImage = new kakao.maps.MarkerImage(
-        markerImageUrl, 
-        new kakao.maps.Size(currentWidth, currentHeight), 
-        { offset: new kakao.maps.Point(currentOffsetX, currentOffsetY) }
+    const markerImage = new kakao.maps.MarkerImage(
+        markerImageUrl,
+        new kakao.maps.Size(width, height),
+        {
+            offset: new kakao.maps.Point(offsetX, offsetY)
+        }
     );
 
-    const fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng);
-    const permanentMarker = new kakao.maps.Marker({
-        position: fixLatLng,
-        image: appMarkerImage, // 어종별 디자인 옷 최종 착용!
-        clickable: true 
+    const marker = new kakao.maps.Marker({
+        position,
+        image: markerImage,
+        clickable: true
     });
-    permanentMarker.setMap(map);
 
-    // 지능형 수심 숫자 누적 맵핑 로직
-    if (isDepthCheckSelect) {
-        const loader = document.getElementById('loading-screen');
-        loader.classList.add('show'); //로딩중
+    marker.setMap(map);
 
-        getOceanDepthData(lastClickLat, lastClickLng, function(depthResponse) { //수심api호출
-            loader.classList.remove('show'); //로딩완료
-            
-            if (depthResponse.success && depthResponse.rawItems && depthResponse.rawItems.length > 0) {
+    return marker;
+}
+
+function createFishingPointData(formData, marker) {
+    return {
+        id: Date.now(),
+        lat: lastClickLat,
+        lng: lastClickLng,
+        address: formData.address,
+        coords: tempCoords,
+
+        date: formData.date,
+        time: formData.time,
+
+        depth: formData.depth || "미입력",      // 사용자가 입력한 수심
+        chartDepth: "미입력",                  // API 수심
+        
+
+        tide: formData.tide || "미입력",
+        temp: formData.temp || "미입력",
+
+        fish: formData.fish,
+
+        tackle: formData.tackle || "미입력",
+        memo: formData.memo || "미입력",
+
+        markerRef: marker
+    };
+}
+
+function loadDepthData(point, callback) {
+
+    const loader =
+        document.getElementById('loading-screen');
+
+    loader.classList.add('show');
+
+    getOceanDepthData(
+        point.lat,
+        point.lng,
+        function(depthResponse) {
+
+            loader.classList.remove('show');
+
+            if (
+                depthResponse.success &&
+                depthResponse.rawItems &&
+                depthResponse.rawItems.length > 0
+            ) {
+
+                point.chartDepth =
+                    depthResponse.depth;
+
                 
-                newPoint.depth = depthResponse.depth + " m";
-                console.log("API 응답 데이터:", depthResponse.distMeter);
-                console.log("API 응답 데이터:", newPoint.depth);
+
                 let addedCount = 0;               
                 
                 depthResponse.rawItems.forEach(function(pt) { //foreach는 반복문
@@ -303,75 +360,231 @@ function saveFishingPoint() {
                 if (addedCount > 0) {
                     alert(`주변에 새로운 수심 데이터 ${addedCount}개가 누적 맵핑되었습니다!`);
                 }
+
+                if (typeof callback === "function") {
+                callback();
+                }
             }
         });
     }
 
-    const newPoint = {
-        id: Date.now(),
-        address: finalAddress,
-        coords: tempCoords,
-        date: finalDate,
-        time: finalTime,
-        depth: finalDepth + (isNaN(finalDepth) ? "" : " m"), 
-        tide: finalTide || "미입력",
-        temp: finalTemp || "미입력",
-        fish: finalFish,
-        tackle: finalTackle || "미입력",
-        memo: finalMemo || "미입력",
-        markerRef: permanentMarker 
-    };
+function attachMarkerClickEvent(marker, point) {
 
-    // 메인 마커 재클릭 이벤트 
-    kakao.maps.event.addListener(permanentMarker, 'click', function() {
-        if (currentInfoWindow) currentInfoWindow.close();
+    kakao.maps.event.addListener(marker, 'click', function() {
+
+        if (currentInfoWindow) {
+            currentInfoWindow.close();
+        }
 
         const detailContent = `
             <div class="info-form" style="padding:12px; width:280px;">
-                <h4 style="margin:0 0 8px 0; color:#dc2626; border-bottom:2px solid #dc2626;">📌 등록된 포인트 상세</h4>
-                <div class="info-row"><span>장소</span><span style="font-size:11px; color:#333;">${newPoint.address}</span></div>
-                <div class="info-row"><span>좌표</span><span style="font-size:11px; color:#007BFF;">${newPoint.coords}</span></div>
-                <div class="info-row"><span>어종</span><span style="font-size:12px; color:#e11d48; font-weight:bold;">🐟 ${newPoint.fish}</span></div>
-                <div class="info-row"><span>수심</span><span style="font-size:12px; color:#007BFF; font-weight:bold;">${newPoint.depth}</span></div>
-                <div class="info-row"><span>날짜</span><span style="font-size:11px; color:#333;">${newPoint.date} ${newPoint.time}</span></div>
-                <div class="info-row"><span>물때/수온</span><span style="font-size:11px; color:#1e3a8a;">${newPoint.tide} / ${newPoint.temp}℃</span></div>
-                <div class="info-row"><span>태클</span><span style="font-size:11px; color:#555;">${newPoint.tackle}</span></div>
-                <div class="info-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:4px;">
-                    <span>기타</span><span style="font-size:11px; color:#666; width:200px; word-break:break-all;">${newPoint.memo}</span>
+                <h4 style="margin:0 0 8px 0; color:#dc2626; border-bottom:2px solid #dc2626;">
+                    📌 등록된 포인트 상세
+                </h4>
+
+                <div class="info-row">
+                    <span>장소</span>
+                    <span style="font-size:11px;">${point.address}</span>
                 </div>
+
+                <div class="info-row">
+                    <span>좌표</span>
+                    <span style="font-size:11px;">${point.coords}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>어종</span>
+                    <span>🐟 ${point.fish}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>입력수심</span>
+                    <span>${point.depth}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>해도수심(근접)</span>
+                    <span>${point.chartDepth}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>날짜</span>
+                    <span>${point.date} ${point.time}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>물때/수온</span>
+                    <span>${point.tide} / ${point.temp}℃</span>
+                </div>
+
+                <div class="info-row">
+                    <span>태클</span>
+                    <span>${point.tackle}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>기타</span>
+                    <span>${point.memo}</span>
+                </div>
+
                 <div style="text-align:right; margin-top:8px;">
-                    <button class="form-btn btn-cancel delete-btn" style="padding:2px 8px; font-size:10px; background:#ef4444; color:white;" data-id="${newPoint.id}">삭제</button>                    
-                    <button class="form-btn btn-cancel close-btn" style="padding:2px 8px; font-size:10px;">닫기</button>
+                    <button
+                        class="form-btn btn-cancel delete-btn"
+                        data-id="${point.id}">
+                        삭제
+                    </button>
+
+                    <button
+                        class="form-btn btn-cancel close-btn">
+                        닫기
+                    </button>
                 </div>
             </div>
         `;
 
-        map.panTo(permanentMarker.getPosition());
-        currentInfoWindow = new kakao.maps.InfoWindow({ content: detailContent, removable: false });
-        currentInfoWindow.open(map, permanentMarker);
+        map.panTo(marker.getPosition());
+
+        currentInfoWindow =
+            new kakao.maps.InfoWindow({
+                content: detailContent,
+                removable: false
+            });
+
+        currentInfoWindow.open(map, marker);
+
         setTimeout(() => {
-        document
-            .querySelector(".delete-btn")
-            ?.addEventListener("click", () => {
-                deleteFishingPoint(newPoint.id);
-            });
-    
-        document
-            .querySelector(".close-btn")
-            ?.addEventListener("click", () => {
-                currentInfoWindow.close();
-            });
+
+            document
+                .querySelector(".delete-btn")
+                ?.addEventListener("click", () => {
+                    deleteFishingPoint(point.id);
+                });
+
+            document
+                .querySelector(".close-btn")
+                ?.addEventListener("click", () => {
+                    currentInfoWindow.close();
+                });
+
         }, 0);
     });
+}
 
-    fishingPointsDataset.push(newPoint);
+async function savePointToFirebase(point) {
+
+    try {
+
+        const saveData = {
+            lat: point.lat,
+            lng: point.lng,
+
+            address: point.address,
+            coords: point.coords,
+
+            date: point.date,
+            time: point.time,
+
+            depth: point.depth,
+            chartDepth: point.chartDepth,
+
+            tide: point.tide,
+            temp: point.temp,
+
+            fish: point.fish,
+
+            tackle: point.tackle,
+            memo: point.memo
+        };
+
+        const docRef = await addDoc(
+            collection(db, "fishingPoints"),
+            saveData
+        );
+
+        point.firebaseId = docRef.id;
+
+        console.log("Firebase 저장 완료:", docRef.id);
+
+    } catch(error) {
+
+        console.error("Firebase 저장 실패:", error);
+
+    }
+}
+async function loadFishingPointsFromFirebase() {
+
+    try {
+
+        const querySnapshot =
+            await getDocs(
+                collection(db, "fishingPoints")
+            );
+        
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            data.firebaseId = doc.id; // 문서 ID를 데이터에 포함
+            
+
+            const marker = createFishingMarker(
+                data.fish,
+                new kakao.maps.LatLng(data.lat, data.lng)
+            );
+            attachMarkerClickEvent(marker,data);
+            data.markerRef = marker;
+            fishingPointsDataset.push(data);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Firestore 로드 실패",
+            error
+        );
+
+    }
+}
+////////////포인트 저장 함수//////////////////////////////////////////
+function saveFishingPoint() {
+
+    const formData = getFormData(); // 폼 데이터 수집
+
+    if (currentInfoWindow) currentInfoWindow.close();
+    if (currentMarker) currentMarker.setMap(null); 
+
+    const fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng); // 클릭한 지점의 좌표를 고정하여 마커 생성에 사용
+    const permanentMarker = createFishingMarker( //어종명 기준 마커 생성
+        formData.fish,
+        fixLatLng
+    );
+
+    const newPoint = createFishingPointData(
+        formData,
+        permanentMarker
+    );
+
+    if (formData.useDepthApi) {
+        loadDepthData(newPoint, function() {
+            savePointToFirebase(newPoint);
+            }) ;
+    }else {
+        savePointToFirebase(newPoint);
+    }
+    attachMarkerClickEvent(permanentMarker, newPoint);   
+
+    fishingPointsDataset.push(newPoint);    
+    
+
     currentMarker = null;
     currentInfoWindow = null;
     
-    if(!isDepthCheckSelect) {
-        alert(`${finalFish} 포인트가 성공적으로 등록되었습니다!`);
+    if(!formData.useDepthApi) {
+        alert(`${formData.fish} 포인트가 성공적으로 등록되었습니다!`);
     }
 }
+
+/////////////////////////////////////////////////////   
 
 function cancelFishingPoint() {
     if (currentInfoWindow) currentInfoWindow.close();
