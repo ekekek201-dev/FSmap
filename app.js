@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 22");
+console.log("버전 23");
 
 
 
@@ -105,6 +105,42 @@ const TideCalculator = {
     }
 };
 
+const lunarNewYearDates = {
+    "2020": "2020-01-25", "2021": "2021-02-12", "2022": "2022-02-01",
+    "2023": "2023-01-22", "2024": "2024-02-10", "2025": "2025-01-29",
+    "2026": "2026-02-17", "2027": "2027-02-07", "2028": "2028-01-27",
+    "2029": "2029-02-13", "2030": "2030-02-03", "2031": "2031-01-23",
+    "2032": "2032-02-11", "2033": "2033-01-31", "2034": "2034-02-19",
+    "2035": "2035-02-08", "2036": "2036-01-28", "2037": "2037-02-15",
+    "2038": "2038-02-04", "2039": "2039-01-24", "2040": "2040-02-12",
+    "2041": "2041-02-01", "2042": "2042-02-10", "2043": "2043-01-30",
+    "2044": "2044-02-19", "2045": "2045-02-07", "2046": "2046-01-28",
+    "2047": "2047-02-16", "2048": "2048-02-05", "2049": "2049-01-25",
+    "2050": "2050-02-12"
+};
+
+function getTideByLunar(dateStr) {
+    const targetDate = new Date(dateStr);
+    const targetYear = targetDate.getFullYear();
+    
+    // 1. 해당 연도의 설날을 가져옴
+    let solDate = new Date(lunarNewYearDates[targetYear]);
+    
+    // 2. 만약 대상 날짜가 설날보다 앞선다면? -> 전년도 설날 기준으로 기준점 변경
+    if (targetDate < solDate) {
+        solDate = new Date(lunarNewYearDates[targetYear - 1]);
+    }
+    
+    // 3. 기준점 대비 지난 일수 계산
+    const diffDays = Math.floor((targetDate - solDate) / (1000 * 60 * 60 * 24));
+    const lunarDay = diffDays + 1; // 음력 1일(설날)이 1일
+
+    // 4. 물때 계산 (음력 1일 = 8물)
+    const tideMap = ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "사리"];
+    const index = (lunarDay + 6) % 15;
+    
+    return tideMap[index];
+}
 
 
 
@@ -320,7 +356,7 @@ function createFishingPointData(formData, marker) {
         
 
         //tide: formData.tide || "미입력",
-        tide : TideCalculator.getTideName(formData.date),
+        tide: getTideByLunar(formData.date),
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
