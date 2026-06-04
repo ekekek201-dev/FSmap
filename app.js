@@ -9,7 +9,28 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 13");
+console.log("버전 14");
+
+document.addEventListener("click", function (e) {
+
+    // ❌ 닫기 버튼
+    if (e.target.classList.contains("close-btn")) {
+        if (currentInfoWindow) currentInfoWindow.close();
+    }
+
+    // ❌ 삭제 버튼
+    if (e.target.classList.contains("delete-btn")) {
+        const id = Number(e.target.dataset.id);
+        deleteFishingPoint(id);
+    }
+
+    // ✏️ 수정 버튼
+    if (e.target.classList.contains("edit-btn")) {
+        const id = Number(e.target.dataset.id);
+        const point = fishingPointsDataset.find(p => p.id === id);
+        if (point) openEditMode(point);
+    }
+});
 
 
 // [상단 전역 변수 섹션]
@@ -446,9 +467,8 @@ function attachMarkerClickEvent(marker, point) {
                         삭제
                     </button>
 
-                    <button
-                        class="form-btn btn-cancel close-btn">
-                        수
+                    <button class="form-btn btn-cancel edit-btn" data-id="${point.id}">
+                        수정
                     </button>
                     
                     <button
