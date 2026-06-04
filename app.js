@@ -239,39 +239,7 @@ function getFormData() {
     };
 }
 
-function createFishingMarker(fishName, position) {
-    let markerImageUrl = FISH_MARKER_MAP["기본"];
-    let width = 10;
-    let height = 10;
-    let offsetX = 5;
-    let offsetY = 5;
 
-    if (FISH_MARKER_MAP[fishName]) {
-        markerImageUrl = FISH_MARKER_MAP[fishName];
-        width = MARKER_WIDTH;
-        height = MARKER_HEIGHT;
-        offsetX = OFFSET_X;
-        offsetY = OFFSET_Y;
-    }
-
-    const markerImage = new kakao.maps.MarkerImage(
-        markerImageUrl,
-        new kakao.maps.Size(width, height),
-        {
-            offset: new kakao.maps.Point(offsetX, offsetY)
-        }
-    );
-
-    const marker = new kakao.maps.Marker({
-        position,
-        image: markerImage,
-        clickable: true
-    });
-
-    marker.setMap(map);
-
-    return marker;
-}
 
 function createFishingPointData(formData, marker) {
     return {
