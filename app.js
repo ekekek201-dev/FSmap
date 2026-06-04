@@ -5,10 +5,11 @@ import {
     addDoc,
     getDocs,
     deleteDoc,
-    doc
+    doc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 12");
+console.log("버전 13");
 
 
 // [상단 전역 변수 섹션]
@@ -447,6 +448,11 @@ function attachMarkerClickEvent(marker, point) {
 
                     <button
                         class="form-btn btn-cancel close-btn">
+                        수
+                    </button>
+                    
+                    <button
+                        class="form-btn btn-cancel close-btn">
                         닫기
                     </button>
                 </div>
@@ -471,6 +477,11 @@ function attachMarkerClickEvent(marker, point) {
                     deleteFishingPoint(point.id);
                 });
 
+            document.querySelector(".edit-btn")
+                ?.addEventListener("click", () => {
+                     openEditMode(point);
+                });
+            
             document
                 .querySelector(".close-btn")
                 ?.addEventListener("click", () => {
@@ -758,4 +769,109 @@ async function deleteFishingPoint(id) {
         console.error("삭제 실패:", error);
         alert("삭제 중 오류가 발생했습니다.");
     }
+}
+
+async function updateFishingPoint(id, updatedData) {
+
+    try {
+        const index = fishingPointsDataset.findIndex(pt => pt.id === id);
+        if (index === -1) return;
+
+        const pt = fishingPointsDataset[index];
+
+        // 1. Firestore 업데이트
+        if (pt.firebaseId) {
+            await updateDoc(
+                doc(db, "fishingPoints", pt.firebaseId),
+                updatedData
+            );
+        }
+
+        // 2. 로컬 데이터 업데이트
+        fishingPointsDataset[index] = {
+            ...pt,
+            ...updatedData
+        };
+
+        alert("수정 완료!");
+        
+    } catch (err) {
+        console.error("수정 실패:", err);
+        alert("수정 중 오류 발생");
+    }
+}
+
+function openEditMode(point) {
+
+    if (currentInfoWindow) currentInfoWindow.close();
+
+    const editContent = `
+        <div class="info-form">
+            <h4>✏️ 포인트 수정</h4>
+
+            <div class="info-row">
+                <span>어종</span>
+                <input type="text" id="e-fish" value="${point.fish}">
+            </div>
+
+            <div class="info-row">
+                <span>수심</span>
+                <input type="text" id="e-depth" value="${point.depth}">
+            </div>
+
+            <div class="info-row">
+                <span>물때</span>
+                <input type="text" id="e-tide" value="${point.tide}">
+            </div>
+
+            <div class="info-row">
+                <span>수온</span>
+                <input type="text" id="e-temp" value="${point.temp}">
+            </div>
+
+            <div class="info-row">
+                <span>태클</span>
+                <input type="text" id="e-tackle" value="${point.tackle}">
+            </div>
+
+            <div class="btn-group">
+                <button class="form-btn btn-submit" id="save-edit">저장</button>
+                <button class="form-btn btn-cancel" id="cancel-edit">취소</button>
+            </div>
+        </div>
+    `;
+
+    const marker = point.markerRef;
+
+    currentInfoWindow = new kakao.maps.InfoWindow({
+        content: editContent,
+        removable: false
+    });
+
+    currentInfoWindow.open(map, marker);
+
+    setTimeout(() => {
+
+        document.getElementById("save-edit")
+            ?.addEventListener("click", () => {
+
+                const updatedData = {
+                    fish: document.getElementById("e-fish").value,
+                    depth: document.getElementById("e-depth").value,
+                    tide: document.getElementById("e-tide").value,
+                    temp: document.getElementById("e-temp").value,
+                    tackle: document.getElementById("e-tackle").value
+                };
+
+                updateFishingPoint(point.id, updatedData);
+
+                currentInfoWindow.close();
+            });
+
+        document.getElementById("cancel-edit")
+            ?.addEventListener("click", () => {
+                currentInfoWindow.close();
+            });
+
+    }, 0);
 }
