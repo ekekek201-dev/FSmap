@@ -28,12 +28,12 @@
      console.log(`🌐 [api-depth.js] 수심 검색 시작 -> 위도: ${clickLat}, 경도: ${clickLng}`);
  
      // 📐 [300m 반경 커버] 클릭 지점 기준 약 전방 300m 박스권 생성 (위경도 오차 보정값 소수점 5자리 절삭)
-     const ymin = (clickLat - 0.0115).toFixed(5);
-     const ymax = (clickLat + 0.0115).toFixed(5);
-     const xmin = (clickLng - 0.0115).toFixed(5);
-     const xmax = (clickLng + 0.0115).toFixed(5);
- 
-     const API_URL = `https://apis.data.go.kr/1192136/waterDepth/GetWaterDepthApiService?serviceKey=${DEPTH_API_SERVICE_KEY}&type=json&ymin=${ymin}&ymax=${ymax}&xmin=${xmin}&xmax=${xmax}`;
+     const ymin = (clickLat - 0.0030).toFixed(5);
+     const ymax = (clickLat + 0.0030).toFixed(5);
+     const xmin = (clickLng - 0.0030).toFixed(5);
+     const xmax = (clickLng + 0.0030).toFixed(5);
+     let numOfRows = 50;
+     const API_URL = `https://apis.data.go.kr/1192136/waterDepth/GetWaterDepthApiService?serviceKey=${DEPTH_API_SERVICE_KEY}&type=json&ymin=${ymin}&ymax=${ymax}&xmin=${xmin}&xmax=${xmax}&numOfRows=${numOfRows}`;
  
      fetch(API_URL, { method: 'GET', headers: { 'accept': '*/*' } })
          .then(response => response.json())
