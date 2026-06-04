@@ -335,7 +335,7 @@ function createFishingMarker(fishName, position) {
     const label = new kakao.maps.CustomOverlay({
         position: position,
         content: `<div class="fish-label">${fishName}</div>`, // 🐟 이모지 없이 깔끔하게 표시
-        yAnchor: 2.0 // 마커 이미지 위로 조금 더 올림
+        yAnchor: 1.0 // 마커 이미지 위로 조금 더 올림
     });
     label.setMap(map);
     return { marker, label };
