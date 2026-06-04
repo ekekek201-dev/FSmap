@@ -8,7 +8,7 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 10");
+console.log("버전 11");
 
 
 // [상단 전역 변수 섹션]
@@ -73,7 +73,7 @@ document
 
 document
     .getElementById("depth-btn")
-    .addEventListener("click", closeListSidebar);
+    .addEventListener("click", updateDepthMap);
 
 
 
@@ -298,7 +298,39 @@ function createFishingPointData(formData, marker) {
     };
 }
 
-function loadDepthData(lat,lng) {
+function updateDepthMap() {
+
+    const center = map.getCenter();
+
+    showDepthData(
+        center.getLat(),
+        center.getLng()
+    );
+}
+
+function clearDepthOverlays() {
+
+    depthTextOverlays.forEach(function(overlay) {
+        overlay.setMap(null);
+    });
+
+    depthTextOverlays.length = 0;
+}
+
+function updateDepthMap() {
+
+    clearDepthOverlays();
+
+    const center =
+        map.getCenter();
+
+    showDepthData(
+        center.getLat(),
+        center.getLng()
+    );
+}
+
+function showDepthData(lat, lng) {
 
     const loader =
         document.getElementById('loading-screen');
@@ -306,61 +338,59 @@ function loadDepthData(lat,lng) {
     loader.classList.add('show');
 
     getOceanDepthData(
-        point.lat,
-        point.lng,
+        lat,
+        lng,
         function(depthResponse) {
 
             loader.classList.remove('show');
 
             if (
-                depthResponse.success &&
-                depthResponse.rawItems &&
-                depthResponse.rawItems.length > 0
+                !depthResponse.success ||
+                !depthResponse.rawItems ||
+                depthResponse.rawItems.length === 0
             ) {
+                return;
+            }
 
+            let addedCount = 0;
 
-                
+            depthResponse.rawItems.forEach(function(pt) {
 
-                let addedCount = 0;               
-                
-                depthResponse.rawItems.forEach(function(pt) { //foreach는 반복문
-                    const targetKey = `${parseFloat(pt.lat).toFixed(5)},${parseFloat(pt.lng).toFixed(5)}`; //중복확인용키생성
-                    const isAlreadyExists = depthTextOverlays.some(function(existingOverlay) { //중복확인depthTextOverlays
-                        const pos = existingOverlay.getPosition();
-                        return `${pos.getLat().toFixed(5)},${pos.getLng().toFixed(5)}` === targetKey;
-                    });
+                const numLatLng =
+                    new kakao.maps.LatLng(
+                        pt.lat,
+                        pt.lng
+                    );
 
-                    if (isAlreadyExists) return; //중복시 리턴
+                const cleanNum =
+                    pt.dpwt.replace(" m", "");
 
-                    const numLatLng = new kakao.maps.LatLng(pt.lat, pt.lng);
-                    const cleanNum = pt.dpwt.replace(" m", ""); //m 삭제
-                    const customOverlayContent = `<div class="sea-depth-number">${cleanNum}</div>`;
-                    
-                    
-                    const depthTextOverlay = new kakao.maps.CustomOverlay({
+                const customOverlayContent =
+                    `<div class="sea-depth-number">${cleanNum}</div>`;
+
+                const depthTextOverlay =
+                    new kakao.maps.CustomOverlay({
                         position: numLatLng,
                         content: customOverlayContent,
-                        yAnchor: 0.5, // 
-                        xAnchor: 0.5  //
+                        yAnchor: 0.5,
+                        xAnchor: 0.5
                     });
-                    
-                    // 📌 [추가] 생성 시점에 현재 줌 레벨을 체크하여 표시/숨김 처리
-                    const currentLevel = map.getLevel();
-                    const SHOW_LEVEL = 8;
-                    depthTextOverlay.setMap(currentLevel <= SHOW_LEVEL ? map : null);
-                                        
-                    // 배열에 담기
-                        depthTextOverlays.push(depthTextOverlay); 
-                        addedCount++;
-                });
-                
-                if (addedCount > 0) {
-                    alert(`주변에 새로운 수심 데이터 ${addedCount}개가 누적 맵핑되었습니다!`);
-                }
 
-            }
-        });
-    }
+                depthTextOverlay.setMap(map);
+
+                depthTextOverlays.push(
+                    depthTextOverlay
+                );
+
+                addedCount++;
+            });
+
+            alert(
+                `수심 데이터 ${addedCount}개 표시 완료`
+            );
+        }
+    );
+}
 
 function attachMarkerClickEvent(marker, point) {
 
