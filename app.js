@@ -71,6 +71,10 @@ document
     .getElementById("list-close-btn")
     .addEventListener("click", closeListSidebar);
 
+document
+    .getElementById("depth-btn")
+    .addEventListener("click", closeListSidebar);
+
 
 
 
