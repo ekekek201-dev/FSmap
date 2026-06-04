@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 16");
+console.log("버전 17");
 
 
 
@@ -864,8 +864,9 @@ function openEditMode(point) {
                 };
 
                 updateFishingPoint(point.id, updatedData);
-
+                Object.assign(point, updatedData);
                 currentInfoWindow.close();
+                attachMarkerClickEvent(point.markerRef, point);
             });
 
         document.getElementById("cancel-edit")
