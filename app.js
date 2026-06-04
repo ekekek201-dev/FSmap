@@ -9,6 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+
 console.log("버전 24");
 
 
@@ -79,50 +80,33 @@ document
 
 
 
+async function loadLunarData() {
+    const response = await fetch('./data/lunar-data.json');
 
-function getTideByFishingRule(lunarDay) {
-    const tideMap = ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "14물"];
-    
-    // 음력 1일이 8물 (인덱스 8)
-    // 공식: (8 + (음력일 - 1)) % 15
-    const index = (8 + (lunarDay - 1)) % 15;
-    
-    return tideMap[index];
+    if (!response.ok) {
+        throw new Error('음력 데이터 로드 실패');
+    }
+
+    return await response.json();
 }
 
+const lunarData = await loadLunarData();
 
 
-// 2000~2100년까지 계산 가능한 초경량 변환 로직
-function solarToLunar(y, m, d) {
-    // 음력 변환 핵심 데이터 (1900년~2100년 기반)
-    const lunarInfo = [
-        0x0b550, 0x056a0, 0x0aba6, 0x025d0, 0x092b0, 0x0b2d6, 0x0a950, 0x055a0, 0x0ca55, 0x0a5b0,
-        0x16b60, 0x056d0, 0x04ae6, 0x04ad0, 0x0a4d0, 0x0d2d6, 0x0d250, 0x0d520, 0x0bada, 0x0b5a0,
-        0x056d0, 0x055d6, 0x04da0, 0x0a4b0, 0x0d4b6, 0x052b0, 0x0a950, 0x066a5, 0x06e50, 0x096a0,
-        0x0ab35, 0x04ba0, 0x0a6d0, 0x065d6, 0x052d0, 0x0a930, 0x055a6, 0x06ad0, 0x0ad50, 0x095b5,
-        0x04b60, 0x0a570, 0x0a4e5, 0x0d260, 0x0e960, 0x0d536, 0x05aa0, 0x06b50, 0x096d5, 0x04ad0,
-        0x0a4d0, 0x0d4d6, 0x0d250, 0x0d520, 0x0b56a, 0x0b5a0, 0x04ba0, 0x0a5b6, 0x052b0, 0x0a930,
-        0x074a6, 0x06aa0, 0x0ad50, 0x04da5, 0x04b60, 0x09570, 0x0a4e6, 0x0d260, 0x0e930, 0x0d535,
-        0x05aa0, 0x06b50, 0x096d0, 0x04ae5, 0x04ad0, 0x0a4d0, 0x0d2d6, 0x0d250, 0x0d520, 0x0bada,
-        0x0b5a0, 0x056d0, 0x055d6, 0x04da0, 0x0a4b0, 0x0d4b6, 0x052b0, 0x0a950, 0x06aa5, 0x06ad0,
-        0x0ab50, 0x04b65, 0x04a70, 0x0a560, 0x0aae4, 0x0d260, 0x0d960, 0x0b535, 0x05aa0, 0x06b50,
-        0x096d0, 0x04bd5, 0x04ad0, 0x0a4d0, 0x0d0b6, 0x0d250, 0x0d520, 0x0b5a6, 0x056d0, 0x055b0,
-        0x049b6, 0x04a40, 0x0aa40, 0x0b4a6, 0x05260, 0x0a950, 0x06d55, 0x06ad0, 0x0ab50, 0x095d5,
-        0x04ae0, 0x0a570, 0x0a4d6, 0x0d260, 0x0d950, 0x0d556, 0x056a0, 0x0a6d0, 0x055d5, 0x052d0,
-        0x0a950, 0x07556, 0x06aa0, 0x0ad50, 0x055a5, 0x04b60, 0x0a570, 0x0a5b6, 0x0a4e0, 0x0d260,
-        0x0d965, 0x0d530, 0x05aa0, 0x06b65, 0x06b50, 0x06b40, 0x04b66, 0x0a570, 0x0a4e0, 0x0d266,
-        0x0d260, 0x0d950, 0x0d5b5, 0x056a0, 0x0a6d0, 0x055d5, 0x052d0, 0x0a950, 0x07556, 0x06aa0,
-        0x0ad50, 0x055a5, 0x04b60, 0x0a570, 0x0a5b6, 0x0a4e0, 0x0d260, 0x0d965, 0x0d530, 0x05aa0,
-        0x06b55, 0x06b50, 0x06b40, 0x04b66, 0x0a570, 0x0a4e0, 0x0d266, 0x0d260, 0x0d950, 0x0d5b5,
-        0x056a0, 0x0a6d0, 0x055d5, 0x052d0, 0x0a950, 0x07556, 0x06aa0, 0x0ad50, 0x055a5, 0x04b60,
-        0x0a570, 0x0a5b6, 0x0a4e0, 0x0d260, 0x0d965, 0x0d530, 0x05aa0, 0x06b55, 0x06b50, 0x06b40,
-        0x04b66, 0x0a570, 0x0a4e0, 0x0d266, 0x0d260, 0x0d950, 0x0d5b5, 0x056a0, 0x0a6d0, 0x055d5
-    ];
-    // ... (이후 100년치 계산을 수행하는 핵심 연산 루프)
-    // 이 함수가 완벽히 음력 날짜를 반환합니다.
-    return { day: 계산된_음력_일자 }; 
+function getMultte(dateStr, lunarData) {
+
+    const lunar = lunarData[dateStr];
+
+    if (!lunar) {
+        return null;
+    }
+
+    return ((lunar.day + 6) % 15) + 1;
 }
 
+const multte = getMultte('2026-06-05', lunarData);
+
+console.log(multte + '물');
 
 // =================================================================
 // 🎨 [대표님 기획 지시사항] 어종별 커스텀 이미지 마커 스펙 정의 파트
@@ -315,7 +299,7 @@ function createFishingMarker(fishName, position) {
     const label = new kakao.maps.CustomOverlay({
         position: position,
         content: `<div class="fish-label">${fishName}</div>`, // 🐟 이모지 없이 깔끔하게 표시
-        yAnchor: 1.0 // 마커 이미지 위로 조금 더 올림
+        yAnchor: 1.5 // 마커 이미지 위로 조금 더 올림
     });
     label.setMap(map);
     return { marker, label };
@@ -336,7 +320,7 @@ function createFishingPointData(formData, marker) {
         
 
         //tide: formData.tide || "미입력",
-        tide: getTideByFishingRule(formData.date),
+        tide: getMultte(formData.date, lunarData) + "물", 
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
@@ -940,4 +924,3 @@ function refreshMarker(point) {
     // 클릭 이벤트 다시 연결
     attachMarkerClickEvent(markerObj.marker, point);
 }
-
