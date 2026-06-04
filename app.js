@@ -80,27 +80,17 @@ document
 
 
 
-// 한국 낚시인 규칙 구현: 음력 1일 = 8물
-function getTideByFishingRule(dateStr) {
-    const date = new Date(dateStr);
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-
-    // 1. 양력을 음력으로 변환하는 함수
-    const lunar = solarToLunar(y, m, d);
-    const lunarDay = lunar.day; // 음력 일자 (1~30)
-
-    // 2. 낚시인 규칙 적용 (음력 1일 = 8물)
-    // 규칙: (음력일 + 7)을 15로 나눈 나머지
-    // 음력 1일일 때: (1 + 7) = 8물
-    // 음력 8일일 때: (8 + 7) = 15(0) = 조금
-    const tideMap = ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "사리"];
+function getTideByFishingRule(lunarDay) {
+    const tideMap = ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "14물"];
     
-    // (lunarDay + 7) % 15 로 계산하여 8물부터 시작하도록 설정
-    const index = (lunarDay + 7) % 15;
+    // 음력 1일이 8물 (인덱스 8)
+    // 공식: (8 + (음력일 - 1)) % 15
+    const index = (8 + (lunarDay - 1)) % 15;
+    
     return tideMap[index];
 }
+
+
 
 // 2000~2100년까지 계산 가능한 초경량 변환 로직
 function solarToLunar(y, m, d) {
@@ -346,7 +336,7 @@ function createFishingPointData(formData, marker) {
         
 
         //tide: formData.tide || "미입력",
-        tide: solarToLunar(formData.date),
+        tide: getTideByFishingRule(formData.date),
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
