@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 17");
+console.log("버전 18");
 
 
 
@@ -792,7 +792,7 @@ async function updateFishingPoint(id, updatedData) {
             ...pt,
             ...updatedData
         };
-
+        refreshMarker(fishingPointsDataset[index]);
         alert("수정 완료!");
         
     } catch (err) {
@@ -875,4 +875,23 @@ function openEditMode(point) {
             });
 
     }, 0);
+}
+
+function refreshMarker(point) {
+
+    // 기존 마커 제거
+    if (point.markerRef) {
+        point.markerRef.setMap(null);
+    }
+
+    // 새 위치
+    const position = new kakao.maps.LatLng(point.lat, point.lng);
+
+    // 새 마커 생성 (fish 기준)
+    const newMarker = createFishingMarker(point.fish, position);
+
+    point.markerRef = newMarker;
+
+    // 클릭 이벤트 다시 연결
+    attachMarkerClickEvent(newMarker, point);
 }
