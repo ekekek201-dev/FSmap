@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 20");
+console.log("버전 21");
 
 
 
@@ -270,7 +270,13 @@ function createFishingMarker(fishName, position) {
 
     marker.setMap(map);
 
-    return marker;
+    const label = new kakao.maps.CustomOverlay({
+        position: position,
+        content: `<div class="fish-label">${fishName}</div>`, // 🐟 이모지 없이 깔끔하게 표시
+        yAnchor: 2.0 // 마커 이미지 위로 조금 더 올림
+    });
+    label.setMap(map);
+    return { marker, label };
 }
 
 function createFishingPointData(formData, marker) {
@@ -546,15 +552,15 @@ async function loadFishingPointsFromFirebase() {
             const data = doc.data();
             data.firebaseId = doc.id; // 문서 ID를 데이터에 포함
             
-
-            const marker = createFishingMarker(
-                data.fish,
-                new kakao.maps.LatLng(data.lat, data.lng)
-            );
-            attachMarkerClickEvent(marker,data);
-            data.markerRef = marker;
+            const position = new kakao.maps.LatLng(data.lat, data.lng);
+            const markerObj = createFishingMarker(data.fish, position);
+            
+            data.markerRef = markerObj.marker;
+            data.labelRef = markerObj.label;
+            
+            
+            attachMarkerClickEvent(markerObj.marker,data);
             fishingPointsDataset.push(data);
-
         });
 
     } catch (error) {
@@ -575,19 +581,16 @@ function saveFishingPoint() {
     if (currentMarker) currentMarker.setMap(null); 
 
     const fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng); // 클릭한 지점의 좌표를 고정하여 마커 생성에 사용
-    const permanentMarker = createFishingMarker( //어종명 기준 마커 생성
-        formData.fish,
-        fixLatLng
-    );
-
+    const markerObj = createFishingMarker(formData.fish, fixLatLng);
     const newPoint = createFishingPointData(
         formData,
-        permanentMarker
+        markerObj.marker
     );
-
+    newPoint.labelRef = markerObj.label;
+    
     savePointToFirebase(newPoint);
-    attachMarkerClickEvent(permanentMarker, newPoint);   
-
+    
+    attachMarkerClickEvent(markerObj.marker, newPoint); 
     fishingPointsDataset.push(newPoint);    
     
 
@@ -751,7 +754,8 @@ async function deleteFishingPoint(id) {
         if (pt.markerRef) {
             pt.markerRef.setMap(null);
         }
-
+        if (pt.labelRef) pt.labelRef.setMap(null);
+        
         // 3. 로컬 데이터 삭제
         fishingPointsDataset.splice(index, 1);
 
@@ -880,19 +884,18 @@ function openEditMode(point) {
 function refreshMarker(point) {
 
     // 기존 마커 제거
-    if (point.markerRef) {
-        point.markerRef.setMap(null);
-    }
-
+    if (point.markerRef) point.markerRef.setMap(null);
+    if (point.labelRef) point.labelRef.setMap(null);
     // 새 위치
     const position = new kakao.maps.LatLng(point.lat, point.lng);
 
     // 새 마커 생성 (fish 기준)
-    const newMarker = createFishingMarker(point.fish, position);
+    const markerObj = createFishingMarker(point.fish, position);
 
-    point.markerRef = newMarker;
-
+    point.markerRef = markerObj.marker;
+    point.labelRef = markerObj.label;
+    
     // 클릭 이벤트 다시 연결
-    attachMarkerClickEvent(newMarker, point);
+    attachMarkerClickEvent(markerObj.marker, point);
 }
 
