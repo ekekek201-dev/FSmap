@@ -564,13 +564,7 @@ function saveFishingPoint() {
         permanentMarker
     );
 
-    if (formData.useDepthApi) {
-        loadDepthData(newPoint, function() {
-            savePointToFirebase(newPoint);
-            }) ;
-    }else {
-        savePointToFirebase(newPoint);
-    }
+    savePointToFirebase(newPoint);
     attachMarkerClickEvent(permanentMarker, newPoint);   
 
     fishingPointsDataset.push(newPoint);    
