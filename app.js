@@ -165,10 +165,6 @@ kakao.maps.event.addListener(map, 'click', function() {
                 <div class="info-row"><span>시간</span><input type="time" id="p-time" value="${currentTimeStr}"></div>
                 <div class="info-row"><span>수심</span><input type="text" id="p-depth" placeholder="예: 7.5 (직접 작성)" style="font-weight:bold; color:#007BFF;"></div>
                 
-                <div class="info-row" style="background:#f8fafc; padding:6px; border-radius:6px; border:1px dashed #cbd5e1; margin-bottom:8px;">
-                    <span style="color:#0f172a; font-size:12px;">🌊 수심확인 (300m 전자해도 번호 표기)</span>
-                    <input type="checkbox" id="p-depth-check" style="width:18px; height:18px; cursor:pointer;" checked>
-                </div>
                 
                 <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="물때 정보 입력"></div>
                 <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
@@ -237,8 +233,7 @@ function getFormData() {
         fish: document.getElementById('p-fish').value || "미입력",
         tackle: document.getElementById('p-tackle').value,
         memo: document.getElementById('p-memo').value,
-
-        useDepthApi: document.getElementById('p-depth-check').checked
+        
     };
 }
 
