@@ -80,7 +80,7 @@ document
 
 
 
-function getTideByFishingRule(lunarDay) {
+function getTideByFishingRule(solarToLunar) {
     const tideMap = ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "14물"];
     
     // 음력 1일이 8물 (인덱스 8)
