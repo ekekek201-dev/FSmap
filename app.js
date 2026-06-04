@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 21");
+console.log("버전 22");
 
 
 
@@ -78,6 +78,32 @@ document
     .addEventListener("click", updateDepthMap);
 
 
+
+
+const TideCalculator = {
+    // 1. 기준일을 설정합니다. (물때는 주기가 있으므로 시작점이 필요합니다)
+    baseDate: new Date("2023-01-14"),
+    
+    // 2. 물때 이름을 순서대로 나열한 배열(리스트)입니다.
+    tideMap: ["조금", "1물", "2물", "3물", "4물", "5물", "6물", "7물", "8물", "9물", "10물", "11물", "12물", "13물", "사리"],
+
+    // 3. 날짜를 넣으면 물때를 계산해주는 함수입니다.
+    getTideName: function(dateStr) {
+        // 4. 입력받은 날짜(dateStr)를 자바스크립트가 계산할 수 있는 날짜 객체로 변환합니다.
+        const targetDate = new Date(dateStr);
+        
+        // 5. 선택한 날짜와 기준일 사이의 '일수(일 단위 차이)'를 계산합니다.
+        // (날짜끼리 빼면 밀리초 단위가 나오므로, 1000*60*60*24를 나누어 '일'로 바꿉니다.)
+        const diffDays = Math.floor((targetDate - this.baseDate) / (1000 * 60 * 60 * 24));
+        
+        // 6. 물때는 15일마다 반복되므로, '전체 일수'를 15로 나눈 나머지(%)를 구합니다.
+        // Math.abs는 음수 날짜(기준일 이전)가 들어와도 계산 오류가 없게 절대값으로 만듭니다.
+        const index = Math.abs(diffDays % 15);
+        
+        // 7. 위에서 구한 나머지(0~14)를 tideMap 배열의 인덱스로 사용하여 해당 물때 이름을 가져옵니다.
+        return this.tideMap[index];
+    }
+};
 
 
 
@@ -290,11 +316,11 @@ function createFishingPointData(formData, marker) {
         date: formData.date,
         time: formData.time,
 
-        depth: formData.depth || "미입력",      // 사용자가 입력한 수심
-        
+        depth: formData.depth || "미입력",      // 사용자가 입력한 수심      
         
 
-        tide: formData.tide || "미입력",
+        //tide: formData.tide || "미입력",
+        tide : TideCalculator.getTideName(formData.date);
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
