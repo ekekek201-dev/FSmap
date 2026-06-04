@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 23");
+console.log("버전 24");
 
 
 
