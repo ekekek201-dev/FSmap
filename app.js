@@ -320,7 +320,7 @@ function createFishingPointData(formData, marker) {
         
 
         //tide: formData.tide || "미입력",
-        tide : TideCalculator.getTideName(formData.date);
+        tide : TideCalculator.getTideName(formData.date),
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
