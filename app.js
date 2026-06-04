@@ -9,7 +9,7 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 18");
+console.log("버전 19");
 
 
 
@@ -546,13 +546,14 @@ async function loadFishingPointsFromFirebase() {
             const data = doc.data();
             data.firebaseId = doc.id; // 문서 ID를 데이터에 포함
             
+            const position = new kakao.maps.LatLng(data.lat, data.lng);
+            const markerObj = createFishingMarker(data.fish, position);
 
-            const marker = createFishingMarker(
-                data.fish,
-                new kakao.maps.LatLng(data.lat, data.lng)
-            );
             attachMarkerClickEvent(marker,data);
-            data.markerRef = marker;
+            
+            data.markerRef = markerObj.marker;
+            data.labelRef = markerObj.label;
+            
             fishingPointsDataset.push(data);
 
         });
@@ -575,16 +576,18 @@ function saveFishingPoint() {
     if (currentMarker) currentMarker.setMap(null); 
 
     const fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng); // 클릭한 지점의 좌표를 고정하여 마커 생성에 사용
-    const permanentMarker = createFishingMarker( //어종명 기준 마커 생성
+    
+    const markerObj = createFishingMarker(
         formData.fish,
         fixLatLng
     );
 
     const newPoint = createFishingPointData(
         formData,
-        permanentMarker
+        markerObj.marker
     );
-
+    newPoint.labelRef = markerObj.label;
+    
     savePointToFirebase(newPoint);
     attachMarkerClickEvent(permanentMarker, newPoint);   
 
@@ -751,6 +754,9 @@ async function deleteFishingPoint(id) {
         if (pt.markerRef) {
             pt.markerRef.setMap(null);
         }
+        if (pt.labelRef) {
+        pt.labelRef.setMap(null);
+        }
 
         // 3. 로컬 데이터 삭제
         fishingPointsDataset.splice(index, 1);
@@ -894,4 +900,35 @@ function refreshMarker(point) {
 
     // 클릭 이벤트 다시 연결
     attachMarkerClickEvent(newMarker, point);
+}
+
+function createFishingMarker(fishName, position) {
+
+    const markerImage = new kakao.maps.MarkerImage(
+        FISH_MARKER_MAP[fishName] || FISH_MARKER_MAP["기본"],
+        new kakao.maps.Size(MARKER_WIDTH, MARKER_HEIGHT),
+        {
+            offset: new kakao.maps.Point(OFFSET_X, OFFSET_Y)
+        }
+    );
+
+    const marker = new kakao.maps.Marker({
+        position,
+        image: markerImage,
+        clickable: true
+    });
+
+    marker.setMap(map);
+
+    // ⭐ fish 텍스트 오버레이 (핵심)
+    const label = new kakao.maps.CustomOverlay({
+        position: position,
+        content: `<div class="fish-label">🐟 ${fishName}</div>`,
+        yAnchor: 1.8
+    });
+
+    label.setMap(map);
+
+    // 둘 다 반환 (중요)
+    return { marker, label };
 }
