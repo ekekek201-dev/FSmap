@@ -298,15 +298,7 @@ function createFishingPointData(formData, marker) {
     };
 }
 
-function updateDepthMap() {
 
-    const center = map.getCenter();
-
-    showDepthData(
-        center.getLat(),
-        center.getLng()
-    );
-}
 
 function clearDepthOverlays() {
 
