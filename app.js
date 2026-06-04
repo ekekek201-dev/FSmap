@@ -8,7 +8,7 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 9");
+console.log("버전 10");
 
 
 // [상단 전역 변수 섹션]
@@ -22,7 +22,7 @@ const depthTextOverlays = [];
 let lastClickLat = 0;
 let lastClickLng = 0;
 let hasLocated = false; // 여기 추가!
-let latestFetchedDepthData = null; // 수심 API에서 가져온 데이터를 저장할 변수
+
 
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
@@ -283,7 +283,7 @@ function createFishingPointData(formData, marker) {
         time: formData.time,
 
         depth: formData.depth || "미입력",      // 사용자가 입력한 수심
-        chartDepth: "미입력",                  // API 수심
+        
         
 
         tide: formData.tide || "미입력",
@@ -298,7 +298,7 @@ function createFishingPointData(formData, marker) {
     };
 }
 
-function loadDepthData(point, callback) {
+function loadDepthData(lat,lng) {
 
     const loader =
         document.getElementById('loading-screen');
@@ -318,8 +318,6 @@ function loadDepthData(point, callback) {
                 depthResponse.rawItems.length > 0
             ) {
 
-                point.chartDepth =
-                    depthResponse.depth;
 
                 
 
@@ -360,9 +358,6 @@ function loadDepthData(point, callback) {
                     alert(`주변에 새로운 수심 데이터 ${addedCount}개가 누적 맵핑되었습니다!`);
                 }
 
-                if (typeof callback === "function") {
-                callback();
-                }
             }
         });
     }
@@ -397,13 +392,8 @@ function attachMarkerClickEvent(marker, point) {
                 </div>
 
                 <div class="info-row">
-                    <span>입력수심</span>
+                    <span>수심</span>
                     <span>${point.depth}</span>
-                </div>
-
-                <div class="info-row">
-                    <span>해도수심(근접)</span>
-                    <span>${point.chartDepth}</span>
                 </div>
 
                 <div class="info-row">
@@ -483,8 +473,7 @@ async function savePointToFirebase(point) {
             date: point.date,
             time: point.time,
 
-            depth: point.depth,
-            chartDepth: point.chartDepth,
+            depth: point.depth,            
 
             tide: point.tide,
             temp: point.temp,
