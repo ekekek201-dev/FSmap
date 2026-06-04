@@ -8,7 +8,7 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-console.log("버전 11");
+console.log("버전 12");
 
 
 // [상단 전역 변수 섹션]
@@ -720,29 +720,42 @@ function initMyPosition() {
         );
     }
 }
-function deleteFishingPoint(id) {
+
+async function deleteFishingPoint(id) {
+
     if (!confirm("이 포인트를 삭제하시겠습니까?")) return;
 
-    // 1. 데이터셋에서 해당 인덱스 찾기
-    const index = fishingPointsDataset.findIndex(function(pt) { return pt.id === id; });
+    const index = fishingPointsDataset.findIndex(pt => pt.id === id);
     if (index === -1) return;
 
     const pt = fishingPointsDataset[index];
 
-    // 2. 지도에서 마커 제거
-    if (pt.markerRef) {
-        pt.markerRef.setMap(null);
-    }
+    try {
+        // 1. Firebase 삭제 (핵심)
+        if (pt.firebaseId) {
+            await deleteDoc(doc(db, "fishingPoints", pt.firebaseId));
+        }
 
-    // 3. 데이터셋에서 삭제
-    fishingPointsDataset.splice(index, 1);
+        // 2. 지도 마커 제거
+        if (pt.markerRef) {
+            pt.markerRef.setMap(null);
+        }
 
-    // 4. UI 닫기 및 알림
-    if (currentInfoWindow) currentInfoWindow.close();
-    alert("포인트가 삭제되었습니다.");
-    
-    // 리스트 사이드바가 열려있다면 새로고침
-    if (document.getElementById('list-sidebar').classList.contains('open')) {
-        openListSidebar();
+        // 3. 로컬 데이터 삭제
+        fishingPointsDataset.splice(index, 1);
+
+        // 4. UI 정리
+        if (currentInfoWindow) currentInfoWindow.close();
+
+        alert("포인트가 삭제되었습니다.");
+
+        // 리스트 새로고침
+        if (document.getElementById('list-sidebar').classList.contains('open')) {
+            openListSidebar();
+        }
+
+    } catch (error) {
+        console.error("삭제 실패:", error);
+        alert("삭제 중 오류가 발생했습니다.");
     }
 }
