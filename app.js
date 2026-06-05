@@ -22,8 +22,12 @@ async function loadStations() {
 }
 
 
+const loader =
+        document.getElementById('loading-screen');
 
-loadStations();
+loader.classList.add('show');
+await loadStations();
+loader.classList.remove('show');
 
 console.log("버전 25");
 
