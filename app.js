@@ -233,7 +233,11 @@ kakao.maps.event.addListener(map, 'click', function() {
                 
                 <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="자동 물때" readonly></div>
                 <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
-                <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
+                <div class="info-row">
+                <span>조위(Tide)</span>
+                <input type="text" id="tide-low" placeholder="간조(Low)" style="width: 115px; margin-right: 5px; border: 1px solid #3b82f6;">
+                <input type="text" id="tide-high" placeholder="만조(High)" style="width: 115px; border: 1px solid #ef4444;">
+                </div>
                
 
                 <div class="info-row">
