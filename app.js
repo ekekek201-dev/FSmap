@@ -25,7 +25,7 @@ async function loadStations() {
 async function load_area() {
     try {
         await new Promise(resolve => setTimeout(resolve, 100));
-        const response = await fetch('result.json');
+        const response = await fetch('area.json');
         stations = await response.json(); // 이제 여기 stations에 데이터가 담김
         console.log(response);
     } catch (error) {
