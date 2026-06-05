@@ -231,9 +231,15 @@ kakao.maps.event.addListener(map, 'click', function() {
                 <div class="info-row"><span>수심</span><input type="text" id="p-depth" placeholder="수심 정보 입력" style="font-weight:bold; color:#007BFF;"></div>
                 
                 
-                <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="물때 정보 입력"></div>
+                <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="자동 물때" readonly></div>
                 <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
-                <div class="info-row"><span>만조간조</span><input type="text" id="p-temp-real" placeholder="만조간조 입력"></div>
+                <div class="info-row">
+                <span>조위(Tide)</span>
+                    <div class="tide-input-box" style="display: flex; gap: 5px; width: 235px;">
+                        <input type="text" id="tide-low" placeholder="간조 (Low)" style="flex: 1; border-color: #3b82f6;">
+                        <input type="text" id="tide-high" placeholder="만조 (High)" style="flex: 1; border-color: #ef4444;">
+                    </div>
+                </div>
                 <div class="info-row">
                     <span>어종</span>
                     <div class="fish-combo-box">
@@ -297,6 +303,8 @@ function getFormData() {
         depth: document.getElementById('p-depth').value,
         tide: document.getElementById('p-tide').value,
         temp: document.getElementById('p-temp-real').value,
+        h_tide: document.getElementById('p-h-tide').value,
+        l_tide: document.getElementById('p-l-tide').value,
 
         fish: document.getElementById('p-fish').value || "미입력",
         tackle: document.getElementById('p-tackle').value,
