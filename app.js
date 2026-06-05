@@ -1059,3 +1059,29 @@ function refreshMarker(point) {
 }
 
 
+function findNearest(lat, lng) {
+    
+    if (stations.length === 0) {
+        console.error("아직 관측소 데이터가 로드되지 않았습니다!");
+        return null;
+    }
+    
+    let minDistance = Infinity;
+    let nearest = null;
+
+    stations.forEach(s => {
+        // 거리 계산 (피타고라스 정리 이용)
+        // 위도/경도 간의 거리이므로 실제 미터 단위는 아니지만, 
+        // 단순히 '가까운 순서'를 찾을 때는 이 정도로 충분합니다.
+        const dx = parseFloat(s.lat) - lat;
+        const dy = parseFloat(s.lot) - lng;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearest = s;
+        }
+    });
+    return nearest;
+}
+
