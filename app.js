@@ -235,8 +235,8 @@ kakao.maps.event.addListener(map, 'click', function() {
                 <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
                 <div class="info-row">
                 <span>조위(Tide)</span>
-                <input type="text" id="tide-low" placeholder="간조(Low)" style="width: 115px; margin-right: 1px; border: 1px solid #3b82f6;">
-                <input type="text" id="tide-high" placeholder="만조(High)" style="width: 115px; border: 1px solid #ef4444;">
+                <input type="text" id="p-l-tide" placeholder="간조(Low)" style="width: 115px;  border: 1px solid #3b82f6;">
+                <input type="text" id="p-h-tide" placeholder="만조(High)" style="width: 115px; border: 1px solid #ef4444;">
                 </div>
                
 
@@ -555,8 +555,8 @@ function attachMarkerClickEvent(marker, point) {
                     <span>${point.tide} / ${point.temp}℃</span>
                 </div>
                     <div class="info-row">
-                    <span>만조간조</span>
-                    <span>${point.tide} / ${point.temp}℃</span>
+                    <span>조석</span>
+                    <span>${point.l_tide} / ${point.h_tide}</span>
                 </div>
 
                 <div class="info-row">
@@ -638,6 +638,8 @@ async function savePointToFirebase(point) {
             depth: point.depth,            
 
             tide: point.tide,
+            l_tide: point.l_tide,
+            h_tide: point.h_tide,
             temp: point.temp,
 
             fish: point.fish,
