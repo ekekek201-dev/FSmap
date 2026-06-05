@@ -34,11 +34,11 @@ await loadStations();
 
 loader.classList.remove('show');
 
-console.log("버전 27");
+console.log("버전 28");
 
 
 
-const aaa = findNearest("126.34277","37.64333");
+const aaa = findNearest(37.64333, 126.34277);
 console.log(aaa);
 
 
