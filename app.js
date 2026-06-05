@@ -71,7 +71,8 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 
     depthTextOverlays.forEach(function(overlay) {
         // 현재 레벨이 8보다 크면(축소) null을 주어 숨기고, 작으면 map을 주어 표시
-        overlay.setMap(level <= SHOW_LEVEL ? map : null);
+        //overlay.setMap(level <= SHOW_LEVEL ? map : null);
+        depthTextOverlays = []; //지도에서 삭
     });
 
     fishingPointsDataset.forEach(function(point) {
