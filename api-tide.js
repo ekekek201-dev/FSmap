@@ -1,4 +1,11 @@
+
 function findNearest(lat, lng) {
+    
+    if (stations.length === 0) {
+        console.error("아직 관측소 데이터가 로드되지 않았습니다!");
+        return null;
+    }
+    
     let minDistance = Infinity;
     let nearest = null;
 
