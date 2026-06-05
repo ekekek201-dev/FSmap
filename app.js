@@ -9,16 +9,21 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-const fs = require('fs');
-const path = require('path');
 
-// FSmap 프로젝트 내의 상대 경로로 데이터 읽기
-const rawData = fs.readFileSync(path.join(__dirname, 'data', 'area.json'), 'utf8');
-const stations = JSON.parse(rawData);
+async function loadStations() {
+    try {
+        const response = await fetch('./data/result.json'); // 상대 경로로 직접 호출
+        const stations = await response.json(); // JSON으로 변환
+        console.log(stations);
+        return stations;
+    } catch (error) {
+        console.error("데이터 로드 실패:", error);
+    }
+}
 
-// 이제 stations 변수를 통해 해당 프로젝트에서 매핑 작업을 진행할 수 있습니다.
-console.log(`${stations.length}개의 관측소 데이터를 불러왔습니다.`);
 
+
+loadStations();
 
 console.log("버전 25");
 
