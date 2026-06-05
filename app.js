@@ -86,8 +86,11 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 });
 
 initMyPosition();
+
 console.log(lat,lng);
-const aaa = findNearest(lat,lng)
+const aaa = findNearest(lat,lng);
+console.log(aaa);
+
 loadFishingPointsFromFirebase();
 
 document
