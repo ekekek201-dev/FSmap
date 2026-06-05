@@ -38,6 +38,10 @@ console.log("버전 27");
 
 
 
+const aaa = findNearest("126.34277","37.64333");
+console.log(aaa);
+
+
 // [상단 전역 변수 섹션]
 let isRegisterMode = false;
 let currentMarker = null;
@@ -87,9 +91,7 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
 
 initMyPosition();
 
-console.log(lat,lng);
-const aaa = findNearest(lat,lng);
-console.log(aaa);
+
 
 loadFishingPointsFromFirebase();
 
