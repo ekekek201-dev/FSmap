@@ -9,8 +9,18 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+const fs = require('fs');
+const path = require('path');
 
-console.log("버전 24");
+// FSmap 프로젝트 내의 상대 경로로 데이터 읽기
+const rawData = fs.readFileSync(path.join(__dirname, 'data', 'area.json'), 'utf8');
+const stations = JSON.parse(rawData);
+
+// 이제 stations 변수를 통해 해당 프로젝트에서 매핑 작업을 진행할 수 있습니다.
+console.log(`${stations.length}개의 관측소 데이터를 불러왔습니다.`);
+
+
+console.log("버전 25");
 
 
 
@@ -1009,4 +1019,25 @@ function refreshMarker(point) {
     
     // 클릭 이벤트 다시 연결
     attachMarkerClickEvent(markerObj.marker, point);
+}
+
+
+function findNearest(lat, lng) {
+    let minDistance = Infinity;
+    let nearest = null;
+
+    stations.forEach(s => {
+        // 거리 계산 (피타고라스 정리 이용)
+        // 위도/경도 간의 거리이므로 실제 미터 단위는 아니지만, 
+        // 단순히 '가까운 순서'를 찾을 때는 이 정도로 충분합니다.
+        const dx = parseFloat(s.lat) - lat;
+        const dy = parseFloat(s.lot) - lng;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearest = s;
+        }
+    });
+    return nearest;
 }
