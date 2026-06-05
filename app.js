@@ -53,6 +53,11 @@ kakao.maps.event.addListener(map, 'zoom_changed', function() {
         // 현재 레벨이 8보다 크면(축소) null을 주어 숨기고, 작으면 map을 주어 표시
         overlay.setMap(level <= SHOW_LEVEL ? map : null);
     });
+
+    fishingPointsDataset.forEach(function(point) {
+        point.labelRef?.setMap(level <= 6 ? map : null);
+    });
+
 });
 
 initMyPosition();
@@ -113,13 +118,25 @@ console.log(multte + '물');
 // =================================================================
 // 💡 대표님! 나중에 쏨뱅이, 붉바리 등의 전용 물고기 도안(PNG)이 나오면 아래 URL 주소만 수정하시면 됩니다.
 // 현재는 구분을 위해 시스템에서 제공하는 서로 다른 색상/모양의 마커 아이콘들로 정밀 매핑해 두었습니다.
-const FISH_MARKER_MAP = {
-    "쏨뱅이": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+const FISH_MARKER_MAP2 = {
+    //"쏨뱅이": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+    "쏨뱅이": "img/redfish.png",
     "붉바리": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
     "볼락": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     "농어": "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
     "기본": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/mini_circle.png",
     "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png" // 추가
+};
+
+const FISH_MARKER_MAP = {
+    "쏨뱅이": "#FF0000",     // 🔴
+    "붉바리": "#FF6600",     // 🟠
+    "볼락": "#8B4513",       // 🟤
+    "농어": "#0066FF",       // 🔵
+    "무늬": "#FFD700",       // 🟡
+    "플랫피쉬": "#00AA00",   // 🟢
+    "회유성": "#9932CC",     // 🟣
+    "기본": "#808080"        // 회색
 };
 
 // 마커 사이즈 및 규격 정의
@@ -191,7 +208,7 @@ kakao.maps.event.addListener(map, 'click', function() {
                 <div class="info-row"><span>좌표</span><input type="text" value="${tempCoords}" readonly style="color:#888;"></div>
                 <div class="info-row"><span>날짜</span><input type="date" id="p-date" value="${currentDateStr}"></div>
                 <div class="info-row"><span>시간</span><input type="time" id="p-time" value="${currentTimeStr}"></div>
-                <div class="info-row"><span>수심</span><input type="text" id="p-depth" placeholder="예: 7.5 (직접 작성)" style="font-weight:bold; color:#007BFF;"></div>
+                <div class="info-row"><span>수심</span><input type="text" id="p-depth" placeholder="수심 정보 입력" style="font-weight:bold; color:#007BFF;"></div>
                 
                 
                 <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="물때 정보 입력"></div>
@@ -207,6 +224,9 @@ kakao.maps.event.addListener(map, 'click', function() {
                             <option value="붉바리">붉바리</option>
                             <option value="볼락">볼락</option>
                             <option value="농어">농어</option>
+                            <option value="무늬">무늬</option>
+                            <option value="플랫피쉬">플랫피쉬</option>
+                            <option value="회유성">회유성</option>
                         </select>
                     </div>
                 </div>
@@ -265,7 +285,52 @@ function getFormData() {
     };
 }
 
-function createFishingMarker(fishName, position) {
+function createFishingMarker(fishName, position, date) {
+    const color =
+    FISH_MARKER_MAP[fishName] ||
+    FISH_MARKER_MAP["기본"];
+
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24">
+        <circle
+            cx="12"
+            cy="12"
+            r="10"
+            fill="${color}"
+            stroke="white"
+            stroke-width="2"/>
+    </svg>`;
+
+
+
+    const markerImage = new kakao.maps.MarkerImage(
+        'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg),
+        new kakao.maps.Size(20, 20),
+        {
+            offset: new kakao.maps.Point(12, 12)
+        }
+    );
+
+
+    const marker = new kakao.maps.Marker({
+        position: position,
+        image: markerImage,
+        clickable: true
+    });
+    marker.setMap(map); 
+    
+    const label = new kakao.maps.CustomOverlay({
+        position: position,
+        content: `<div class="fish-label">${date}</div>`, // 🐟 이모지 없이 깔끔하게 표시
+        yAnchor: 1.5 // 마커 이미지 위로 조금 더 올림
+    });
+    label.setMap(map);
+    return { marker, label };
+}
+
+function createFishingMarker_png(fishName, position) {
     let markerImageUrl = FISH_MARKER_MAP["기본"];
     let width = 10;
     let height = 10;
@@ -579,7 +644,7 @@ async function loadFishingPointsFromFirebase() {
             data.firebaseId = doc.id; // 문서 ID를 데이터에 포함
             
             const position = new kakao.maps.LatLng(data.lat, data.lng);
-            const markerObj = createFishingMarker(data.fish, position);
+            const markerObj = createFishingMarker(data.fish, position, data.date);
             
             data.markerRef = markerObj.marker;
             data.labelRef = markerObj.label;
@@ -607,7 +672,7 @@ function saveFishingPoint() {
     if (currentMarker) currentMarker.setMap(null); 
 
     const fixLatLng = new kakao.maps.LatLng(lastClickLat, lastClickLng); // 클릭한 지점의 좌표를 고정하여 마커 생성에 사용
-    const markerObj = createFishingMarker(formData.fish, fixLatLng);
+    const markerObj = createFishingMarker(formData.fish, fixLatLng, formData.date);
     const newPoint = createFishingPointData(
         formData,
         markerObj.marker
@@ -788,7 +853,7 @@ async function deleteFishingPoint(id) {
         // 4. UI 정리
         if (currentInfoWindow) currentInfoWindow.close();
 
-        alert("포인트가 삭제되었습니다.");
+        //alert("포인트가 삭제되었습니다.");
 
         // 리스트 새로고침
         if (document.getElementById('list-sidebar').classList.contains('open')) {
@@ -841,7 +906,22 @@ function openEditMode(point) {
 
             <div class="info-row">
                 <span>어종</span>
-                <input type="text" id="e-fish" value="${point.fish}">
+
+                <input
+                    type="text"
+                    id="e-fish"
+                    value="${point.fish}"
+                    list="fish-list">
+
+                <datalist id="fish-list">
+                    <option value="쏨뱅이">
+                    <option value="붉바리">
+                    <option value="볼락">
+                    <option value="농어">
+                    <option value="무늬">
+                    <option value="플랫피쉬">
+                    <option value="회유성">
+                </datalist>
             </div>
 
             <div class="info-row">
@@ -862,6 +942,11 @@ function openEditMode(point) {
             <div class="info-row">
                 <span>태클</span>
                 <input type="text" id="e-tackle" value="${point.tackle}">
+            </div>
+
+            <div class="info-row">
+                <span>기타</span>
+                <input type="text" id="e-memo" value="${point.memo}">
             </div>
 
             <div class="btn-group">
@@ -890,7 +975,8 @@ function openEditMode(point) {
                     depth: document.getElementById("e-depth").value,
                     tide: document.getElementById("e-tide").value,
                     temp: document.getElementById("e-temp").value,
-                    tackle: document.getElementById("e-tackle").value
+                    tackle: document.getElementById("e-tackle").value,
+                    memo: document.getElementById("e-memo").value
                 };
 
                 updateFishingPoint(point.id, updatedData);
@@ -916,7 +1002,7 @@ function refreshMarker(point) {
     const position = new kakao.maps.LatLng(point.lat, point.lng);
 
     // 새 마커 생성 (fish 기준)
-    const markerObj = createFishingMarker(point.fish, position);
+    const markerObj = createFishingMarker(point.fish, position, point.date);
 
     point.markerRef = markerObj.marker;
     point.labelRef = markerObj.label;
