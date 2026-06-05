@@ -12,7 +12,7 @@ import {
 
 async function loadStations() {
     try {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 100));
         const response = await fetch('./data/area.json'); // 상대 경로로 직접 호출
         const stations = await response.json(); // JSON으로 변환
         //console.log(stations);
@@ -22,12 +22,25 @@ async function loadStations() {
     }
 }
 
+async function load_area() {
+    try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const response = await fetch('result.json');
+        stations = await response.json(); // 이제 여기 stations에 데이터가 담김
+        console.log(response);
+    } catch (error) {
+        console.error("데이터 로드 실패:", error);
+    }
+}
+
+
 
 const loader =
         document.getElementById('loading-screen');
 
 loader.classList.add('show');
 await loadStations();
+await load_area();
 loader.classList.remove('show');
 
 console.log("버전 27");
