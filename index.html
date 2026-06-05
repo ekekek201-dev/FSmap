@@ -102,14 +102,50 @@
             box-shadow: 1px 1px 2px rgba(0,0,0,0.2); font-family: monospace; text-shadow: 0px 0px 2px white;
         }
         .fish-label {
-            background: rgba(255, 255, 255, 0.8);
+            /* background: rgba(255, 255, 255, 0.8); */
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: bold;
-            border: 1px solid #ccc;
-            white-space: nowrap; /* 글자가 줄바꿈되지 않게 함 */
+
+            color: white;
+
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px  1px 0 #000,
+                1px  1px 0 #000;
+
+            /* border: 1px solid #ccc; */
+
+            white-space: nowrap;
         }
+        
+        #fish-legend {
+    position: absolute;
+
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%);
+
+    z-index: 100;
+
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 20px;
+
+    padding: 6px 12px;
+
+    color: #333;
+    font-size: 11px;
+    font-weight: bold;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+    white-space: nowrap;
+}
+        
+
 
         /* ⏳ 전체화면 암전 로딩레이어 디자인 */
         .loading-layer {
@@ -162,6 +198,16 @@
         <button id="my-loc-btn" class="menu-btn">🎯 현재 위치</button> 
         <button id="list-btn" class="menu-btn">🗂️ 등록 리스트</button>
         <button id="depth-btn" class="menu-btn">🌊 수심확인</button>
+    </div>
+
+    <div id="fish-legend">
+    🔴 쏨뱅이
+    🟠 붉바리
+    🟤 볼락
+    🔵 농어    
+    🟡 무늬
+    🟢 플랫피쉬
+    🟣 회유성
     </div>
 
     <div id="map"></div>
