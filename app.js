@@ -15,23 +15,14 @@ async function loadStations() {
         await new Promise(resolve => setTimeout(resolve, 100));
         const response = await fetch('./data/area.json'); // 상대 경로로 직접 호출
         const stations = await response.json(); // JSON으로 변환
-        //console.log(stations);
+        console.log(stations);
         return stations;
     } catch (error) {
         console.error("데이터 로드 실패:", error);
     }
 }
 
-async function load_area() {
-    try {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const response = await fetch('area.json');
-        stations = await response.json(); // 이제 여기 stations에 데이터가 담김
-        console.log(response);
-    } catch (error) {
-        console.error("데이터 로드 실패:", error);
-    }
-}
+
 
 
 
@@ -40,7 +31,7 @@ const loader =
 
 loader.classList.add('show');
 await loadStations();
-await load_area();
+
 loader.classList.remove('show');
 
 console.log("버전 27");
@@ -1062,22 +1053,3 @@ function refreshMarker(point) {
 }
 
 
-function findNearest(lat, lng) {
-    let minDistance = Infinity;
-    let nearest = null;
-
-    stations.forEach(s => {
-        // 거리 계산 (피타고라스 정리 이용)
-        // 위도/경도 간의 거리이므로 실제 미터 단위는 아니지만, 
-        // 단순히 '가까운 순서'를 찾을 때는 이 정도로 충분합니다.
-        const dx = parseFloat(s.lat) - lat;
-        const dy = parseFloat(s.lot) - lng;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < minDistance) {
-            minDistance = distance;
-            nearest = s;
-        }
-    });
-    return nearest;
-}
