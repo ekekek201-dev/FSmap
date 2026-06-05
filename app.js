@@ -12,7 +12,7 @@ import {
 
 async function loadStations() {
     try {
-        const response = await fetch('./data/result.json'); // 상대 경로로 직접 호출
+        const response = await fetch('./data/area.json'); // 상대 경로로 직접 호출
         const stations = await response.json(); // JSON으로 변환
         console.log(stations);
         return stations;
