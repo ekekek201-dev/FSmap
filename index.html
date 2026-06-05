@@ -166,17 +166,11 @@
 </head>
 <body>
 
-    <div id="password-gate" class="gate-container">
-        <h2>🎣 낚데이터 VIP 진입</h2>
-        <p>암호를 입력하셔야 출조 조준경 지도가 열립니다.</p>
-        <input type="password" id="password-input" placeholder="비밀번호 입력" maxlength="4" onkeypress="if(event.keyCode==13) checkVipPassword()">
-        <button onclick="checkVipPassword()">확인</button>
-        <p id="error-msg" class="error-text">⚠️ 암호가 올바르지 않습니다!</p>
-    </div>
+
 
     <div id="loading-screen" class="loading-layer">
         <div class="spinner"></div>
-        <div id="loading-text">🌊 주변 300m 격자 수심 맵 분석 중...</div>
+        <div id="loading-text">🌊 로딩중...</div>
     </div>
 
     <div id="pointer" class="center-pointer">
@@ -216,23 +210,7 @@
     <script src="api-depth.js"></script>
     <script type="module" src="app.js"></script>
 
-    <script>
-        function checkVipPassword() {
-            const inputVal = document.getElementById('password-input').value;
-            const errorMsg = document.getElementById('error-msg');
-            const gate = document.getElementById('password-gate');
-            const menuBar = document.getElementById('menu-bar');
 
-            if (inputVal === "2076") {
-                gate.style.opacity = "0";
-                setTimeout(() => { gate.style.display = 'none'; menuBar.style.display = 'flex'; }, 300);
-            } else {
-                errorMsg.style.display = 'block';
-                document.getElementById('password-input').value = "";
-                document.getElementById('password-input').focus();
-            }
-        }
-    </script>
 
 </body>
 </html>
