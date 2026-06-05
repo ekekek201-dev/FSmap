@@ -12,7 +12,7 @@ import {
 
 async function loadStations() {
     try {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 500));
         const response = await fetch('./data/area.json'); // 상대 경로로 직접 호출
         const stations = await response.json(); // JSON으로 변환
         //console.log(stations);
@@ -414,7 +414,9 @@ function createFishingPointData(formData, marker) {
         
 
         //tide: formData.tide || "미입력",
-        tide: getMultte(formData.date, lunarData) + "물", 
+        tide: getMultte(formData.date, lunarData) + "물",
+        l_tide: formData.l_tide,
+        h_tide: formData.h_tide,
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
