@@ -546,6 +546,10 @@ function attachMarkerClickEvent(marker, point) {
                     <span>물때/수온</span>
                     <span>${point.tide} / ${point.temp}℃</span>
                 </div>
+                    <div class="info-row">
+                    <span>만조간조</span>
+                    <span>${point.tide} / ${point.temp}℃</span>
+                </div>
 
                 <div class="info-row">
                     <span>태클</span>
