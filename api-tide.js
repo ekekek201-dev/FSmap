@@ -1,3 +1,4 @@
+let stations = [];
 
 function findNearest(lat, lng) {
     
