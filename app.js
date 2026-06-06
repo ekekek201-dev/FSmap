@@ -30,15 +30,12 @@ const loader =
 
 loader.classList.add('show');
 let stations = await loadStations();
-console.log(stations);
 loader.classList.remove('show');
 
 console.log("버전 29");
 
 
 
-const aaa = findNearest(37.64333, 126.34277);
-console.log(aaa);
 
 
 // [상단 전역 변수 섹션]
@@ -48,7 +45,7 @@ let currentInfoWindow = null;
 const fishingPointsDataset = []; 
 let tempCoords = ""; 
 let myLocationMarker = null;
-const depthTextOverlays = []; 
+let depthTextOverlays = []; 
 let lastClickLat = 0;
 let lastClickLng = 0;
 let hasLocated = false; // 여기 추가!
@@ -409,7 +406,8 @@ function createFishingMarker_png(fishName, position) {
     return { marker, label };
 }
 
-function createFishingPointData(formData, marker) {
+function createFishingPointData(formData, marker,tideData) {
+    //const tideData = await getAllTideData(37.123, 126.456, '20260605');
     return {
         id: Date.now(),
         lat: lastClickLat,
@@ -425,8 +423,10 @@ function createFishingPointData(formData, marker) {
 
         //tide: formData.tide || "미입력",
         tide: getMultte(formData.date, lunarData) + "물",
-        l_tide: formData.l_tide,
-        h_tide: formData.h_tide,
+        //l_tide: formData.l_tide,
+        //h_tide: formData.h_tide,
+        l_tide: tideData?.prevTide|| "미입력",
+        h_tide: tideData?.nextTide|| "미입력",
         temp: formData.temp || "미입력",
 
         fish: formData.fish,
@@ -532,6 +532,22 @@ function attachMarkerClickEvent(marker, point) {
             currentInfoWindow.close();
         }
 
+        const lValue = Number(point.l_tide.match(/\(([-\d.]+)\)/)?.[1] || 0);
+        const hValue = Number(point.h_tide.match(/\(([-\d.]+)\)/)?.[1] || 0);
+
+        const lColor = lValue < hValue ? 'blue' : 'red';
+        const hColor = hValue > lValue ? 'red' : 'blue';
+
+        const tideHtml = `
+            <span style="color:${lColor};font-weight:bold">
+                ${point.l_tide}
+            </span>
+            /
+            <span style="color:${hColor};font-weight:bold">
+                ${point.h_tide}
+            </span>
+            `;
+        
         const detailContent = `
             <div class="info-form" style="padding:12px; width:280px;">
                 <h4 style="margin:0 0 8px 0; color:#dc2626; border-bottom:2px solid #dc2626;">
@@ -569,7 +585,7 @@ function attachMarkerClickEvent(marker, point) {
                 </div>
                     <div class="info-row">
                     <span>조석</span>
-                    <span>${point.l_tide} / ${point.h_tide}</span>
+                    <span>${tideHtml}</span>
                 </div>
 
                 <div class="info-row">
@@ -711,9 +727,17 @@ async function loadFishingPointsFromFirebase() {
     }
 }
 ////////////포인트 저장 함수//////////////////////////////////////////
-function saveFishingPoint() {
+async function saveFishingPoint() {
+    loader.classList.add('show');
 
     const formData = getFormData(); // 폼 데이터 수집
+    
+    const tideData = await getAllTideData(
+        lastClickLat,
+        lastClickLng,
+        formData.date,
+        formData.time
+    );
 
     if (currentInfoWindow) currentInfoWindow.close();
     if (currentMarker) currentMarker.setMap(null); 
@@ -722,7 +746,8 @@ function saveFishingPoint() {
     const markerObj = createFishingMarker(formData.fish, fixLatLng, formData.date);
     const newPoint = createFishingPointData(
         formData,
-        markerObj.marker
+        markerObj.marker,
+        tideData
     );
     newPoint.labelRef = markerObj.label;
     
@@ -734,7 +759,8 @@ function saveFishingPoint() {
 
     currentMarker = null;
     currentInfoWindow = null;
-    
+    loader.classList.remove('show');
+
     if(!formData.useDepthApi) {
         alert(`${formData.fish} 포인트가 성공적으로 등록되었습니다!`);
     }
@@ -1084,4 +1110,14 @@ function findNearest(lat, lng) {
     });
     return nearest;
 }
+
+async function getAllTideData(lat,lng, date,time) {
+    
+    const station = findNearest(lat, lng);
+    console.log("가장 가까운 관측소:", station.name, `(${station.lat}, ${station.lot})`);
+    const tideData = await getTideData(station.code, date,time);
+
+    return tideData;
+};
+
 
