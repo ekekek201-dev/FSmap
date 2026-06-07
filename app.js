@@ -10,10 +10,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 
-async function loadStations() {
+async function loadStations(path) {
     try {
         await new Promise(resolve => setTimeout(resolve, 100));
-        const response = await fetch('./data/area.json'); // 상대 경로로 직접 호출
+        const response = await fetch(path); // 상대 경로로 직접 호출
         const stations = await response.json(); // JSON으로 변환        
         return stations;
     } catch (error) {
@@ -29,7 +29,8 @@ const loader =
         document.getElementById('loading-screen');
 
 loader.classList.add('show');
-let stations = await loadStations();
+let stations = await loadStations('./data/area.json');
+let stations_temp = await loadStations('./data/temp-area.json');
 loader.classList.remove('show');
 
 console.log("버전 29");
@@ -243,9 +244,10 @@ kakao.maps.event.addListener(map, 'click', function() {
                 <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보 입력"></div>
                 <div class="info-row">
                 <span>조위(Tide)</span>
-                <input type="text" id="p-l-tide" placeholder="간조(Low)" style="width: 115px;  border: 1px solid #3b82f6;">
-                <input type="text" id="p-h-tide" placeholder="만조(High)" style="width: 115px; border: 1px solid #ef4444;">
+                <input type="text" id="p-l-tide" placeholder="간조(자동)" style="width: 105px; margin-left:15px; border: 1px solid #3b82f6;" readonly>
+                <input type="text" id="p-h-tide" placeholder="만조(자동)" style="width: 105px; border: 1px solid #ef4444;" readonly>
                 </div>
+                
                
 
                 <div class="info-row">
@@ -406,7 +408,7 @@ function createFishingMarker_png(fishName, position) {
     return { marker, label };
 }
 
-function createFishingPointData(formData, marker,tideData) {
+function createFishingPointData(formData, marker,tideData,tideData_temp) {
     //const tideData = await getAllTideData(37.123, 126.456, '20260605');
     return {
         id: Date.now(),
@@ -425,10 +427,10 @@ function createFishingPointData(formData, marker,tideData) {
         tide: getMultte(formData.date, lunarData) + "물",
         //l_tide: formData.l_tide,
         //h_tide: formData.h_tide,
-        l_tide: tideData?.prevTide|| "미입력",
-        h_tide: tideData?.nextTide|| "미입력",
-        temp: formData.temp || "미입력",
-
+        l_tide: tideData?.prevTide|| "조회실패",
+        h_tide: tideData?.nextTide|| "조회실패",
+        //temp: formData.temp || "미입력",        
+        temp: tideData_temp || "조회실패",
         fish: formData.fish,
 
         tackle: formData.tackle || "미입력",
@@ -551,7 +553,7 @@ function attachMarkerClickEvent(marker, point) {
         const detailContent = `
             <div class="info-form" style="padding:12px; width:280px;">
                 <h4 style="margin:0 0 8px 0; color:#dc2626; border-bottom:2px solid #dc2626;">
-                    📌 등록된 포인트 상세
+                    📌 포인트 저장 정보
                 </h4>
 
                 <div class="info-row">
@@ -559,10 +561,12 @@ function attachMarkerClickEvent(marker, point) {
                     <span style="font-size:11px;">${point.address}</span>
                 </div>
 
+                <!--
                 <div class="info-row">
                     <span>좌표</span>
                     <span style="font-size:11px;">${point.coords}</span>
                 </div>
+                -->
 
                 <div class="info-row">
                     <span>어종</span>
@@ -655,6 +659,7 @@ async function savePointToFirebase(point) {
     try {
 
         const saveData = {
+            id: point.id,
             lat: point.lat,
             lng: point.lng,
 
@@ -738,7 +743,14 @@ async function saveFishingPoint() {
         formData.date,
         formData.time
     );
-
+    
+    const tideData_temp = await getAllTideData_temp(
+        lastClickLat,
+        lastClickLng,
+        formData.date,
+        formData.time
+    );
+    
     if (currentInfoWindow) currentInfoWindow.close();
     if (currentMarker) currentMarker.setMap(null); 
 
@@ -747,7 +759,8 @@ async function saveFishingPoint() {
     const newPoint = createFishingPointData(
         formData,
         markerObj.marker,
-        tideData
+        tideData,
+        tideData_temp
     );
     newPoint.labelRef = markerObj.label;
     
@@ -933,6 +946,8 @@ async function deleteFishingPoint(id) {
             openListSidebar();
         }
 
+        
+
     } catch (error) {
         console.error("삭제 실패:", error);
         alert("삭제 중 오류가 발생했습니다.");
@@ -1085,7 +1100,7 @@ function refreshMarker(point) {
 }
 
 
-function findNearest(lat, lng) {
+function findNearest(lat, lng,stations) {
     
     if (stations.length === 0) {
         console.error("아직 관측소 데이터가 로드되지 않았습니다!");
@@ -1113,11 +1128,21 @@ function findNearest(lat, lng) {
 
 async function getAllTideData(lat,lng, date,time) {
     
-    const station = findNearest(lat, lng);
+    const station = findNearest(lat, lng, stations);
     console.log("가장 가까운 관측소:", station.name, `(${station.lat}, ${station.lot})`);
     const tideData = await getTideData(station.code, date,time);
 
     return tideData;
 };
+
+async function getAllTideData_temp(lat,lng, date,time) {
+    
+    const station_temp = findNearest(lat, lng, stations_temp);
+    console.log("가장 가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot})`);
+    const tideData_temp = await getWaterTemp(station_temp.code, date,time);
+
+    return tideData_temp;
+};
+
 
 
