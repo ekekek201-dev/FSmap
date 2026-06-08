@@ -300,7 +300,7 @@ async function getWaterTemp_bak(obsCode, reqDate, time) {
     }
 }
 
-async function getWaterTemp(obsCode, reqDate, time) {
+async function getWaterTemp_a(obsCode, reqDate, time) {
 
     const req = reqDate.replaceAll('-', '');
     const cacheKey = `${obsCode}_${reqDate}`;
@@ -317,6 +317,193 @@ async function getWaterTemp(obsCode, reqDate, time) {
         `&min=60` +
         `&numOfRows=24` +
         `&include=obsvtrNm,obsrvnDt,wtem`;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+
+        try {
+
+            let items;
+
+            // 첫 시도만 캐시 사용
+            if (attempt === 1 && tideCache_temp[cacheKey]) {
+
+                console.log('수온 캐시 사용');
+
+                items = tideCache_temp[cacheKey];
+
+            } else {
+
+                console.log(`수온 API 호출 (${attempt}/3)`);
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                items = data?.body?.items?.item;
+
+                if (!items?.length) {
+                    throw new Error('수온 데이터 없음');
+                }
+
+                // 정상 데이터면 캐시 갱신
+                tideCache_temp[cacheKey] = items;
+            }
+
+            items.sort((a, b) =>
+                a.obsrvnDt.localeCompare(b.obsrvnDt)
+            );
+
+            const [hour, minute] = time.split(':');
+
+            const targetDate = new Date(
+                Number(req.substring(0, 4)),
+                Number(req.substring(4, 6)) - 1,
+                Number(req.substring(6, 8)),
+                Number(hour),
+                Number(minute)
+            );
+
+            const tempData = [...items]
+                .reverse()
+                .find(item =>
+                    new Date(item.obsrvnDt.replace(' ', 'T')) <= targetDate
+                );
+
+            if (!tempData) {
+                throw new Error('해당 시간 이전 수온 데이터 없음');
+            }
+
+            return tempData.wtem;
+
+        } catch (e) {
+
+            // 캐시가 문제일 수 있으니 제거
+            delete tideCache_temp[cacheKey];
+
+            console.error(
+                `수온 조회 실패 (${attempt}/3):`,
+                e
+            );
+
+            if (attempt === 3) {
+                return null;
+            }
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
+        }
+    }
+}
+
+
+async function getWaterTemp_b(obsCode, reqDate, time) {
+
+    const req = reqDate.replaceAll('-', '');
+    const cacheKey = `${obsCode}_${reqDate}`;
+
+    const API_KEY =
+        '27441bf5450704615e12175286ff5b62c526acc1bed6e9690d3fef6fc7e9102f';
+
+    const url =
+        `https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService` +
+        `?serviceKey=${API_KEY}` +
+        `&type=json` +
+        `&obsCode=${obsCode}` +
+        `&reqDate=${req}` +
+        `&min=60` +
+        `&numOfRows=24` +
+        `&include=obsvtrNm,obsrvnDt,wtem`;
+
+
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+
+        try {
+
+            let items;
+
+            // 첫 시도만 캐시 사용
+            if (attempt === 1 && tideCache_temp[cacheKey]) {
+
+                console.log('수온 캐시 사용');
+
+                items = tideCache_temp[cacheKey];
+
+            } else {
+
+                console.log(`수온 API 호출 (${attempt}/3)`);
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                items = data?.body?.items?.item;
+
+                if (!items?.length) {
+                    throw new Error('수온 데이터 없음');
+                }
+
+                // 정상 데이터면 캐시 갱신
+                tideCache_temp[cacheKey] = items;
+            }
+
+            items.sort((a, b) =>
+                a.obsrvnDt.localeCompare(b.obsrvnDt)
+            );
+
+            const [hour, minute] = time.split(':');
+
+            const targetDate = new Date(
+                Number(req.substring(0, 4)),
+                Number(req.substring(4, 6)) - 1,
+                Number(req.substring(6, 8)),
+                Number(hour),
+                Number(minute)
+            );
+
+            const tempData = [...items]
+                .reverse()
+                .find(item =>
+                    new Date(item.obsrvnDt.replace(' ', 'T')) <= targetDate
+                );
+
+            if (!tempData) {
+                throw new Error('해당 시간 이전 수온 데이터 없음');
+            }
+
+            return tempData.wtem;
+
+        } catch (e) {
+
+            // 캐시가 문제일 수 있으니 제거
+            delete tideCache_temp[cacheKey];
+
+            console.error(
+                `수온 조회 실패 (${attempt}/3):`,
+                e
+            );
+
+            if (attempt === 3) {
+                return null;
+            }
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
+        }
+    }
+}
+
+
+async function getWaterTemp_c(obsCode, time) {
+
+
+    const API_KEY =
+        'qPwOeIrU-2606-PWULNZ-1637';
+
+    const url =
+        `https://www.nifs.go.kr/api/OpenAPI_json?id=risaCode&key=` +
+        `${API_KEY}`;
+
 
     for (let attempt = 1; attempt <= 3; attempt++) {
 
