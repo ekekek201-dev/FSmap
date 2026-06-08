@@ -30,7 +30,7 @@ const loader =
 
 loader.classList.add('show');
 let stations = await loadStations('./data/area.json');
-let stations_temp = await loadStations('./data/temp-area.json');
+let stations_temp = await loadStations('./data/temp-area-a.json');
 loader.classList.remove('show');
 
 console.log("버전 29");
@@ -1138,10 +1138,16 @@ async function getAllTideData(lat,lng, date,time) {
 async function getAllTideData_temp(lat,lng, date,time) {
     
     const station_temp = findNearest(lat, lng, stations_temp);
-    console.log("가장 가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot})`);
-    const tideData_temp = await getWaterTemp(station_temp.code, date,time);
+    console.log("가장 가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type})`);
+    if(station_temp.type == "api_a") {
+        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
 
-    return tideData_temp;
+        return tideData_temp;
+    } else if(station_temp.type == "api_b") {
+        const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);
+
+        return tideData_temp;
+    }
 };
 
 
