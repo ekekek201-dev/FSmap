@@ -1,9 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
 
-const apiKey_nifs_1 = 'qPwOeIrU-2606-VYGMOO-1638' //실시간
-const apiKey_nifs_2 = 'qPwOeIrU-2606-PWULNZ-1637' //연안정지관측
-const apiKey = '27441bf5450704615e12175286ff5b62c526acc1bed6e9690d3fef6fc7e9102f';
+const apiKey_nifs_1 = process.env.API_KEY_1; //실시간
+const apiKey = process.env.API_KEY;
 let stationCodes = ['DT_0020','DT_0021','DT_0022','DT_0023','DT_0024'];
 const now = new Date(
     new Date().toLocaleString('en-US', {
