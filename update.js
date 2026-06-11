@@ -3,6 +3,10 @@ const fs = require('fs');
 
 const apiKey_nifs_1 = process.env.API_KEY_1; //실시간
 const apiKey = process.env.API_KEY;
+
+console.log('API_KEY:', process.env.API_KEY ? 'OK' : 'FAIL');
+console.log('API_KEY_NIFS_1:', process.env.API_KEY_NIFS_1 ? 'OK' : 'FAIL');
+
 let stationCodes = ['DT_0020','DT_0021','DT_0022','DT_0023','DT_0024'];
 const now = new Date(
     new Date().toLocaleString('en-US', {
