@@ -2,7 +2,7 @@ name: Update Water Data
 
 on:
   schedule:
-    - cron: '5 * * * *'   # 매시간 5분
+    - cron: '30 * * * *'   # 매시간 30분
   workflow_dispatch:      # 수동 실행 가능
 
 permissions:
