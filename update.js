@@ -10,8 +10,9 @@ const now = new Date(
         timeZone: 'Asia/Seoul'
     })
 );
+
 const resultFile =
-    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
+    `data/temp/${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
 
 
 const failed = [];
