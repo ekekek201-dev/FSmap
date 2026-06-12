@@ -1,4 +1,4 @@
-name: Update temp Data
+name: Update_temp_Data
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  update:
+  Update_temp_Data:
     runs-on: ubuntu-latest
 
     steps:
