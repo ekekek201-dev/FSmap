@@ -4,7 +4,8 @@ on:
   schedule:
     - cron: '*/15 * * * *'  # 매 15분마다 (더 안정적)
   workflow_dispatch:
-
+  push:
+     branches: [main]
 permissions:
   contents: write
 
