@@ -1,4 +1,4 @@
-name: Update Water Data
+name: Update temp Data
 
 on:
   schedule:
