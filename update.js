@@ -47,7 +47,7 @@ async function fetchStationData_api_a() {
         }
     }
 
-    const batchSize = 10;
+    const batchSize = 20;
 
     for (let i = 0; i < stationCodes.length; i += batchSize) {
 
@@ -124,7 +124,7 @@ async function fetchStationData_api_b() {
         }
     }
 
-    const batchSize = 10;
+    const batchSize = 20;
 
     for (let i = 0; i < stationCodes.length; i += batchSize) {
 
