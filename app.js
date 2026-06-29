@@ -767,7 +767,7 @@ async function saveFishingPoint() {
     loader.classList.remove('show');
 
     if(!formData.useDepthApi) {
-        alert(`${formData.fish} 포인트가 성공적으로 등록되었습니다!`);
+        //alert(`${formData.fish} 포인트가 성공적으로 등록되었습니다!`);
     }
 }
 
@@ -778,7 +778,7 @@ function cancelFishingPoint() {
     if (currentMarker) currentMarker.setMap(null);
     currentMarker = null;
     currentInfoWindow = null;
-    alert("등록이 취소되었습니다.");
+    //alert("등록이 취소되었습니다.");
 }
 
 function openListSidebar() {
