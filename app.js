@@ -561,6 +561,11 @@ function attachMarkerClickEvent(marker, point) {
                 -->
 
                 <div class="info-row">
+                    <span>날짜</span>
+                <span>${point.date} ${point.time}</span>
+                </div>
+                
+                <div class="info-row">
                     <span>어종</span>
                     <span>🐟 ${point.fish}</span>
                 </div>
@@ -571,17 +576,13 @@ function attachMarkerClickEvent(marker, point) {
                 </div>
 
                 <div class="info-row">
-                    <span>날짜</span>
-                    <span>${point.date} ${point.time}</span>
+                    <span>물때</span>
+                    <span>${point.tide} / ${tideHtml}</span>
                 </div>
-
+                
                 <div class="info-row">
-                    <span>물때/수온</span>
-                    <span>${point.tide} / ${point.temp}℃</span>
-                </div>
-                    <div class="info-row">
-                    <span>조석</span>
-                    <span>${tideHtml}</span>
+                    <span>수온</span>
+                    <span>${point.temp}℃</span>
                 </div>
 
                 <div class="info-row">
