@@ -1010,12 +1010,12 @@ function openEditMode(point) {
                 <input type="text" id="e-depth" value="${point.depth}">
             </div>
 
-            <div class="info-row">
+            <div class="info-row" style="display:none;">
                 <span>물때</span>
                 <input type="text" id="e-tide" value="${point.tide}">
             </div>
 
-            <div class="info-row">
+            <div class="info-row" style="display:none;">
                 <span>수온</span>
                 <input type="text" id="e-temp" value="${point.temp}">
             </div>
