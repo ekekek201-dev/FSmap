@@ -33,7 +33,7 @@ let stations = await loadStations('./data/area.json');
 let stations_temp = await loadStations('./data/temp-area-a.json');
 loader.classList.remove('show');
 
-console.log("버전 30");
+console.log("버전 31");
 
 
 
@@ -230,16 +230,16 @@ kakao.maps.event.addListener(map, 'click', function() {
             <div class="info-form">
                 <h4>🎣 포인트 정보 입력 (v1.2 어종커스텀)</h4>
                 <div class="info-row"><span>장소</span><input type="text" id="p-pos" value="${addressName}" readonly></div>
-                <div class="info-row"><span>좌표</span><input type="text" value="${tempCoords}" readonly style="color:#888;"></div>
+                <div class="info-row"><span>좌표</span><input type="hidden" value="${tempCoords}" readonly style="color:#888;"></div>
                 <div class="info-row"><span>날짜</span><input type="date" id="p-date" value="${currentDateStr}"></div>
                 <div class="info-row"><span>시간</span><input type="time" id="p-time" value="${currentTimeStr}"></div>
                 <div class="info-row"><span>수심</span><input type="text" id="p-depth" placeholder="수심 정보 입력" style="font-weight:bold; color:#007BFF;"></div>                         
-                <div class="info-row"><span>물때</span><input type="text" id="p-tide" placeholder="자동 물때" readonly></div>
-                <div class="info-row"><span>수온</span><input type="text" id="p-temp-real" placeholder="수온 정보" readonly></div>
+                <div class="info-row"><span>물때</span><input type="hidden" id="p-tide" placeholder="자동 물때" readonly></div>
+                <div class="info-row"><span>수온</span><input type="hidden" id="p-temp-real" placeholder="수온 정보" readonly></div>
                 <div class="info-row">
                 <span>조위(Tide)</span>
-                <input type="text" id="p-l-tide" placeholder="간조(자동)" style="width: 105px; margin-left:15px; border: 1px solid #3b82f6;" readonly>
-                <input type="text" id="p-h-tide" placeholder="만조(자동)" style="width: 105px; border: 1px solid #ef4444;" readonly>
+                <input type="hidden" id="p-l-tide" placeholder="간조(자동)" style="width: 105px; margin-left:15px; border: 1px solid #3b82f6;" readonly>
+                <input type="hidden" id="p-h-tide" placeholder="만조(자동)" style="width: 105px; border: 1px solid #ef4444;" readonly>
                 </div>
                 
                 <div class="info-row">
