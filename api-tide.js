@@ -498,7 +498,7 @@ async function getWaterTemp_c(obsCode, time) {
 
 
     const API_KEY =
-        'qPwOeIrU-2606-PWULNZ-1637';
+        'qPwOeIrU-2606-VYGMOO-1638';
 
     const url =
         `https://www.nifs.go.kr/api/OpenAPI_json?id=risaCode&key=` +
