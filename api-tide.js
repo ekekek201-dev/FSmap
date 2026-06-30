@@ -494,7 +494,7 @@ async function getWaterTemp_b(obsCode, reqDate, time) {
 
 async function getWaterTemp_c(obsCode, time) {
     
-    
+    const cacheKey = `${obsCode}`;
     const API_KEY =
         'qPwOeIrU-2606-VYGMOO-1638';
 
