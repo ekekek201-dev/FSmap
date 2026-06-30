@@ -161,7 +161,7 @@ const FISH_MARKER_MAP = {
     "무늬": "#FFD700",       // 🟡
     "플랫피쉬": "#00AA00",   // 🟢
     "회유성": "#9932CC",     // 🟣
-    "내위치": "#808080",      // 회색
+    "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", 
     "기본": "#808080"        // 회색
 };
 
