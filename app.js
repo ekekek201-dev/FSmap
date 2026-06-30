@@ -34,7 +34,7 @@ let stations = await loadStations('./data/area.json');
 let stations_temp = await loadStations('./data/temp-allarea.json');
 loader.classList.remove('show');
 
-console.log("버전 31");
+console.log("버전 32");
 
 
 
