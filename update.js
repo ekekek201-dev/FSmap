@@ -35,9 +35,98 @@ const coords = JSON.parse( //관측소코드 불러오기
     fs.readFileSync('./coords.json', 'utf8')
 );
 
-
-
 async function fetchStationData_api_a() { 
+
+    console.log("api_a 데이터 수집 시작...");
+
+    let results = {};
+
+    if (fs.existsSync(resultFile)) {
+        try {
+            const content = fs.readFileSync(resultFile, 'utf8');
+            if (content.trim()) {
+                results = JSON.parse(content);
+            }
+        } catch (err) {
+            console.error('result.json 읽기 실패:', err.message);
+        }
+    }
+
+    const batchSize = 20;
+
+    for (let i = 0; i < stationCodes.length; i += batchSize) {
+
+        const batch = stationCodes.slice(i, i + batchSize);
+
+        const responses = await Promise.allSettled(
+            batch.map(async (code) => {
+
+                const url =
+                    `https://apis.data.go.kr/1192136/surveyWaterTemp/GetSurveyWaterTempApiService` +
+                    `?serviceKey=${apiKey}` +
+                    `&type=json` +
+                    `&obsCode=${code}` +
+                    `&min=60` +
+                    `&numOfRows=24`;
+                    
+                const response = await axios.get(url, {timeout: 10000});
+
+                return {
+                    code,
+                    data: response.data
+                };
+            })
+        );
+
+        for (const res of responses) {
+
+            if (res.status !== 'fulfilled') {
+                console.log(`네트워크 실패: ${code} ${res.reason.message}`);
+                failed.push({
+                        code: code || "unknown",
+                        reason: res.reason?.message || "unknown"
+                    });
+                continue;
+            }
+        
+            const { code, data } = res.value;
+        
+            if (!data || !data.header) {
+                console.log(`비정상 응답: ${code}`);
+                failed.push({ code, reason: "invalid_response" });
+                continue;
+            }
+        
+            if (data.header.resultCode === '00') {
+        
+                const tempData = [];
+        
+                for (const item of data.body.items.item) {
+                    tempData.push({
+                        time: item.obsrvnDt.slice(11, 16),
+                        temp: item.wtem
+                    });
+                }
+        
+                console.log(`성공: ${code} ${data.body.items.item[0].obsvtrNm}`);
+                results[code] = tempData;
+        
+            } else {
+                console.log(`실패: ${code} ${data.header.resultCode} ${data.header.resultMsg}`);
+                failed.push(code);
+            }
+        }
+    }
+    console.log(failed);
+    fs.writeFileSync(
+        resultFile,
+        JSON.stringify(results, null, 2)
+    );
+
+    console.log("완료!");
+}
+
+async function fetchStationData_api_a_bak() { 
 
     console.log("api_a 데이터 수집 시작...");
 
