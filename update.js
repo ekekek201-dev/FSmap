@@ -54,13 +54,13 @@ async function fetchStationData_api_a() {
         }
     }
 
-    const batchSize = 20;
+    const batchSize = 10;
 
     for (let i = 0; i < stationCodes.length; i += batchSize) {
 
         const batch = stationCodes.slice(i, i + batchSize);
 
-        const responses = await Promise.all(
+        const responses = await Promise.allSettled(
             batch.map(async (code) => {
 
                 const url =
@@ -71,7 +71,7 @@ async function fetchStationData_api_a() {
                     `&min=60` +
                     `&numOfRows=24`;
                     
-                const response = await axios.get(url);
+                const response = await axios.get(url, {timeout: 10000});
 
                 return {
                     code,
@@ -131,19 +131,19 @@ async function fetchStationData_api_b() {
         }
     }
 
-    const batchSize = 20;
+    const batchSize = 10;
 
     for (let i = 0; i < stationCodes.length; i += batchSize) {
 
         const batch = stationCodes.slice(i, i + batchSize);
 
-        const responses = await Promise.all(
+        const responses = await Promise.allSettled(
             batch.map(async (code) => {
 
                 const url = `https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService?serviceKey=${apiKey}&numOfRows=24&obsCode=${code}&min=60&type=json`;
                 
                     
-                const response = await axios.get(url);
+                const response = await axios.get(url, {timeout: 10000});
 
                 return {
                     code,
@@ -204,7 +204,7 @@ async function fetchStationData_api_c() {
     }
     //const url = `https://www.nifs.go.kr/api/OpenAPI_json?id=risaCode&key=${apiKey_nifs_1}`;
     const url = `https://www.nifs.go.kr/api/OpenAPI_json?id=risaList&key=${apiKey_nifs_1}`
-    const response = await axios.get(url);
+    const response = await axios.get(url, {timeout: 10000});
     const data = response.data;
     
     try{
