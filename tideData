@@ -301,13 +301,11 @@ function getFormData() {
         address: document.getElementById('p-pos').value,
         date: document.getElementById('p-date').value,
         time: document.getElementById('p-time').value,
-
         depth: document.getElementById('p-depth').value,
         tide: document.getElementById('p-tide').value,
         temp: document.getElementById('p-temp-real').value,
         h_tide: document.getElementById('p-h-tide').value,
         l_tide: document.getElementById('p-l-tide').value,
-
         fish: document.getElementById('p-fish').value || "미입력",
         tackle: document.getElementById('p-tackle').value,
         memo: document.getElementById('p-memo').value,
@@ -408,26 +406,17 @@ function createFishingPointData(formData, marker,tideData,tideData_temp) {
         lng: lastClickLng,
         address: formData.address,
         coords: tempCoords,
-
         date: formData.date,
         time: formData.time,
-
-        depth: formData.depth || "미입력",      // 사용자가 입력한 수심      
-        
-
-        //tide: formData.tide || "미입력",
+        depth: formData.depth || "미입력",  
         tide: getMultte(formData.date, lunarData) + "물",
-        //l_tide: formData.l_tide,
-        //h_tide: formData.h_tide,
         l_tide: tideData?.prevTide|| "조회실패",
         h_tide: tideData?.nextTide|| "조회실패",
-        //temp: formData.temp || "미입력",        
+        tide_dis: tideData?.distance|| "조회실패",       
         temp: tideData_temp || "조회실패",
         fish: formData.fish,
-
         tackle: formData.tackle || "미입력",
         memo: formData.memo || "미입력",
-
         markerRef: marker
     };
 }
@@ -582,7 +571,7 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>조석</span>
-                    <span>${tideHtml}</span>
+                    <span>${tideHtml} - ${point.tide_dis}떨어짐</span>
                 </div>
                 
                 <div class="info-row">
@@ -672,6 +661,7 @@ async function savePointToFirebase(point) {
             tide: point.tide,
             l_tide: point.l_tide,
             h_tide: point.h_tide,
+            tide_dis: point.tide_dis,
             temp: point.temp,
 
             fish: point.fish,
@@ -1176,6 +1166,7 @@ async function getAllTideData(lat,lng, date,time) {
     const station = findNearest(lat, lng, stations);
     console.log("가장 가까운 관측소:", station.name, `(${station.lat}, ${station.lot}, ${station.distance})`);
     const tideData = await getTideData(station.code, date,time);
+    tideData.distance = station.distance;
     console.log(tideData);
     return tideData;
 };
