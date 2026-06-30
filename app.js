@@ -30,7 +30,8 @@ const loader =
 
 loader.classList.add('show');
 let stations = await loadStations('./data/area.json');
-let stations_temp = await loadStations('./data/temp-area-a.json');
+//let stations_temp = await loadStations('./data/temp-area-a.json');
+let stations_temp = await loadStations('./data/temp-allarea.json');
 loader.classList.remove('show');
 
 console.log("버전 31");
