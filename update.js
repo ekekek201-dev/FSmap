@@ -1,5 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
 
 const apiKey_nifs_1 = process.env.API_KEY_NIFS_1; //실시간
 const apiKey = process.env.API_KEY;
@@ -7,19 +8,25 @@ const apiKey = process.env.API_KEY;
 
 
 let stationCodes = ['DT_0020','DT_0021','DT_0022','DT_0023','DT_0024'];
+
 const now = new Date(
     new Date().toLocaleString('en-US', {
         timeZone: 'Asia/Seoul'
     })
 );
 
-if (!fs.existsSync('./data/temp')) {
-    fs.mkdirSync('./data/temp', { recursive: true });
-}
 
-const resultFile =
+const resultFile_bak =
     `data/temp/${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
 
+const yyyy = now.getFullYear();
+const mm = String(now.getMonth() + 1).padStart(2, '0');
+const dd = String(now.getDate()).padStart(2, '0');
+
+const baseDir = path.join(__dirname, 'data', 'temp', yyyy.toString(), mm);
+const resultFile = path.join(baseDir, `${yyyy}-${mm}-${dd}.json`);
+
+fs.mkdirSync(baseDir, { recursive: true });
 
 const failed = [];
 
