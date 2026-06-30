@@ -225,10 +225,10 @@ kakao.maps.event.addListener(map, 'click', function() {
     geocoder.coord2RegionCode(lastClickLng, lastClickLat, function(result, status) {
         const addressName = (status === kakao.maps.services.Status.OK && result[0]) ? result[0].address_name : "알 수 없는 지역";
 
-        // 🌟 [대표님 지시: 어종 선택 콤보박스 디자인 탑재]
+     
         const formContent = `
             <div class="info-form">
-                <h4>🎣 포인트 정보 입력 (v1.2 어종커스텀)</h4>
+                <h4>🎣 포인트 정보 입력</h4>
                 <div class="info-row"><span>장소</span><input type="text" id="p-pos" value="${addressName}" readonly></div>
                 <div class="info-row" style="display:none;"><span>좌표</span><input type="hidden" value="${tempCoords}" readonly style="color:#888;"></div>
                 <div class="info-row"><span>날짜</span><input type="date" id="p-date" value="${currentDateStr}"></div>
@@ -577,7 +577,12 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>물때</span>
-                    <span>${point.tide} / ${tideHtml}</span>
+                    <span>${point.tide}</span>
+                </div>
+
+                <div class="info-row">
+                    <span>조석</span>
+                    <span>${tideHtml}</span>
                 </div>
                 
                 <div class="info-row">
@@ -1154,9 +1159,6 @@ function findNearest_bak(lat, lng,stations) {
     let nearest = null;
 
     stations.forEach(s => {
-        // 거리 계산 (피타고라스 정리 이용)
-        // 위도/경도 간의 거리이므로 실제 미터 단위는 아니지만, 
-        // 단순히 '가까운 순서'를 찾을 때는 이 정도로 충분합니다.
         const dx = parseFloat(s.lat) - lat;
         const dy = parseFloat(s.lot) - lng;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -1186,6 +1188,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
         const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
 
         return tideData_temp;
+        
     } else if(station_temp.type == "api_b") {
         const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);
 
