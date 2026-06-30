@@ -34,7 +34,7 @@ let stations = await loadStations('./data/area.json');
 let stations_temp = await loadStations('./data/temp-allarea.json');
 loader.classList.remove('show');
 
-console.log("버전 32");
+console.log("버전 33");
 
 
 
@@ -1187,6 +1187,11 @@ async function getAllTideData_temp(lat,lng, date,time) {
                distance: station_temp.distance};
         
     } else if(station_temp.type == "api_b") {
+        const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);        
+        return {temp: tideData_temp,
+               distance: station_temp.distance};
+        
+    } else if(station_temp.type == "api_c") {
         const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);        
         return {temp: tideData_temp,
                distance: station_temp.distance};
