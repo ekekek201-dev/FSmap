@@ -69,7 +69,7 @@ async function fetchStationData_api_a() {
                     `&min=60` +
                     `&numOfRows=24`;
                     
-                const response = await axios.get(url, {timeout: 10000});
+                const response = await axios.get(url, {timeout: 30000});
 
                 return {
                     code,
@@ -161,7 +161,7 @@ async function fetchStationData_api_b() {
                     `&type=json`;
 
                 const response = await axios.get(url, {
-                    timeout: 10000
+                    timeout: 30000
                 });
 
                 return {
