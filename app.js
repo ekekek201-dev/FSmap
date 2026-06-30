@@ -1093,7 +1093,57 @@ function refreshMarker(point) {
 }
 
 
-function findNearest(lat, lng,stations) {
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // 지구 반지름(km)
+
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1 - a)
+    );
+
+    return R * c; // km
+}
+
+function findNearest(lat, lng, stations) {
+
+    if (stations.length === 0) {
+        console.error("아직 관측소 데이터가 로드되지 않았습니다!");
+        return null;
+    }
+
+    let minDistance = Infinity;
+    let nearest = null;
+
+    stations.forEach(s => {
+        const distance = getDistance(
+            lat,
+            lng,
+            parseFloat(s.lat),
+            parseFloat(s.lot)
+        );
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearest = s;            
+        }
+    });
+
+    return {
+    ...nearest,
+    distance: `${Math.round(minDistance)}km`
+};
+}
+
+function findNearest_bak(lat, lng,stations) {
     
     if (stations.length === 0) {
         console.error("아직 관측소 데이터가 로드되지 않았습니다!");
@@ -1131,7 +1181,7 @@ async function getAllTideData(lat,lng, date,time) {
 async function getAllTideData_temp(lat,lng, date,time) {
     
     const station_temp = findNearest(lat, lng, stations_temp);
-    console.log("가장 가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type})`);
+    console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
     if(station_temp.type == "api_a") {
         const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
 
