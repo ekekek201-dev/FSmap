@@ -571,7 +571,7 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>조석</span>
-                    <span>${tideHtml} - ${point.tide_dis}떨어짐</span>
+                    <span>${tideHtml}${point.tide_dis !== undefined ? ` - ${point.tide_dis}떨어짐` : ''}</span>
                 </div>
                 
                 <div class="info-row">
