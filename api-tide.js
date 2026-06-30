@@ -466,9 +466,7 @@ async function getWaterTemp_b(obsCode, reqDate, time) {
                     new Date(item.obsrvnDt.replace(' ', 'T')) <= targetDate
                 );
 
-            if (!tempData) {
-                throw new Error('해당 시간 이전 수온 데이터 없음');
-            }
+
 
             return tempData.wtem;
 
@@ -495,13 +493,13 @@ async function getWaterTemp_b(obsCode, reqDate, time) {
 
 
 async function getWaterTemp_c(obsCode, time) {
-
-
+    
+    
     const API_KEY =
         'qPwOeIrU-2606-VYGMOO-1638';
 
     const url =
-        `https://www.nifs.go.kr/api/OpenAPI_json?id=risaCode&key=` +
+        `https://www.nifs.go.kr/api/OpenAPI_json?id=risaList&key=` +
         `${API_KEY}`;
 
 
@@ -531,35 +529,19 @@ async function getWaterTemp_c(obsCode, time) {
                     throw new Error('수온 데이터 없음');
                 }
 
+                for (const item of items){
+                    if(item.sta_cde == obsCode && item.obs_lay == '1'){
+                        console.log(item.wtr_tmp)                        
+                        return item.wtr_tmp;
+                    }
+                }
+                
                 // 정상 데이터면 캐시 갱신
                 tideCache_temp[cacheKey] = items;
             }
 
-            items.sort((a, b) =>
-                a.obsrvnDt.localeCompare(b.obsrvnDt)
-            );
 
-            const [hour, minute] = time.split(':');
-
-            const targetDate = new Date(
-                Number(req.substring(0, 4)),
-                Number(req.substring(4, 6)) - 1,
-                Number(req.substring(6, 8)),
-                Number(hour),
-                Number(minute)
-            );
-
-            const tempData = [...items]
-                .reverse()
-                .find(item =>
-                    new Date(item.obsrvnDt.replace(' ', 'T')) <= targetDate
-                );
-
-            if (!tempData) {
-                throw new Error('해당 시간 이전 수온 데이터 없음');
-            }
-
-            return tempData.wtem;
+            
 
         } catch (e) {
 
