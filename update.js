@@ -60,7 +60,7 @@ async function fetchStationData_api_a() {
 
         const batch = stationCodes.slice(i, i + batchSize);
 
-        const responses = await Promise.allSettled(
+        const responses = await Promise.all(
             batch.map(async (code) => {
 
                 const url =
@@ -137,7 +137,7 @@ async function fetchStationData_api_b() {
 
         const batch = stationCodes.slice(i, i + batchSize);
 
-        const responses = await Promise.allSettled(
+        const responses = await Promise.all(
             batch.map(async (code) => {
 
                 const url = `https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService?serviceKey=${apiKey}&numOfRows=24&obsCode=${code}&min=60&type=json`;
