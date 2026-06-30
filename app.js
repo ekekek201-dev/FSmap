@@ -412,7 +412,8 @@ function createFishingPointData(formData, marker,tideData,tideData_temp) {
         tide: getMultte(formData.date, lunarData) + "물",
         l_tide: tideData?.prevTide|| "조회실패",
         h_tide: tideData?.nextTide|| "조회실패",
-        tide_dis: tideData?.distance|| "조회실패",       
+        tide_dis: tideData?.distance|| "조회실패",
+        temp_dis: tideData_temp?.distance|| "조회실패", 
         temp: tideData_temp || "조회실패",
         fish: formData.fish,
         tackle: formData.tackle || "미입력",
@@ -576,7 +577,7 @@ function attachMarkerClickEvent(marker, point) {
                 
                 <div class="info-row">
                     <span>수온</span>
-                    <span>${point.temp}℃</span>
+                    <span>${point.temp}℃${point.temp_dis !== undefined ? ` - ${point.temp_dis}떨어짐` : ''}</span>
                 </div>
 
                 <div class="info-row">
@@ -662,6 +663,7 @@ async function savePointToFirebase(point) {
             l_tide: point.l_tide,
             h_tide: point.h_tide,
             tide_dis: point.tide_dis,
+            temp_dis: point.temp_dis,
             temp: point.temp,
 
             fish: point.fish,
@@ -1177,12 +1179,12 @@ async function getAllTideData_temp(lat,lng, date,time) {
     console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
     if(station_temp.type == "api_a") {
         const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
-
+        tideData_temp.distance = station_temp.distance;
         return tideData_temp;
         
     } else if(station_temp.type == "api_b") {
         const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);
-
+        tideData_temp.distance = station_temp.distance;
         return tideData_temp;
     }
 };
