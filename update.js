@@ -126,6 +126,102 @@ async function fetchStationData_api_a() {
     console.log("완료!");
 }
 
+async function fetchStationData_api_b() {
+
+    console.log("api_b 데이터 수집 시작...");
+
+    let results = {};
+
+    if (fs.existsSync(resultFile)) {
+        try {
+            const content = fs.readFileSync(resultFile, 'utf8');
+            if (content.trim()) {
+                results = JSON.parse(content);
+            }
+        } catch (err) {
+            console.error('result.json 읽기 실패:', err.message);
+        }
+    }
+
+    const batchSize = 20;
+
+    for (let i = 0; i < stationCodes.length; i += batchSize) {
+
+        const batch = stationCodes.slice(i, i + batchSize);
+
+        const responses = await Promise.allSettled(
+            batch.map(async (code) => {
+
+                const url =
+                    `https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService` +
+                    `?serviceKey=${apiKey}` +
+                    `&numOfRows=24` +
+                    `&obsCode=${code}` +
+                    `&min=60` +
+                    `&type=json`;
+
+                const response = await axios.get(url, {
+                    timeout: 10000
+                });
+
+                return {
+                    code,
+                    data: response.data
+                };
+            })
+        );
+
+        for (const res of responses) {
+
+            if (res.status !== 'fulfilled') {
+                console.log(`네트워크 실패: ${res.reason.message}`);
+                failed.push('network_error');
+                continue;
+            }
+
+            const { code, data } = res.value;
+
+            if (!data?.header) {
+                console.log(`비정상 응답: ${code}`);
+                failed.push(code);
+                continue;
+            }
+
+            if (data.header.resultCode === '00') {
+
+                const tempData = [];
+
+                for (const item of data.body.items.item) {
+                    tempData.push({
+                        time: item.obsrvnDt.slice(11, 16),
+                        temp: item.artmp
+                    });
+                }
+
+                console.log(`성공: ${code} ${data.body.items.item[0].obsvtrNm}`);
+                results[code] = tempData;
+
+            } else {
+
+                console.log(
+                    `실패: ${code} ${data.header.resultCode} ${data.header.resultMsg}`
+                );
+
+                failed.push(code);
+            }
+        }
+    }
+
+    console.log(failed);
+
+    fs.writeFileSync(
+        resultFile,
+        JSON.stringify(results, null, 2)
+    );
+
+    console.log("완료!");
+}
+
 async function fetchStationData_api_a_bak() { 
 
     console.log("api_a 데이터 수집 시작...");
@@ -203,7 +299,7 @@ async function fetchStationData_api_a_bak() {
     console.log("완료!");
 }
 
-async function fetchStationData_api_b() { 
+async function fetchStationData_api_b_bak() { 
 
     console.log("api_b 데이터 수집 시작...");
 
