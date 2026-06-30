@@ -414,7 +414,7 @@ function createFishingPointData(formData, marker,tideData,tideData_temp) {
         h_tide: tideData?.nextTide|| "조회실패",
         tide_dis: tideData?.distance|| "조회실패",
         temp_dis: tideData_temp?.distance|| "조회실패", 
-        temp: tideData_temp || "조회실패",
+        temp: tideData_temp.temp || "조회실패",
         fish: formData.fish,
         tackle: formData.tackle || "미입력",
         memo: formData.memo || "미입력",
@@ -1178,14 +1178,14 @@ async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
     if(station_temp.type == "api_a") {
-        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
-        tideData_temp.distance = station_temp.distance;
-        return tideData_temp;
+        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);        
+        return {temp: tideData_temp,
+               distance: station_temp.distance};
         
     } else if(station_temp.type == "api_b") {
-        const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);
-        tideData_temp.distance = station_temp.distance;
-        return tideData_temp;
+        const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);        
+        return {temp: tideData_temp,
+               distance: station_temp.distance};
     }
 };
 
