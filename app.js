@@ -51,6 +51,24 @@ let lastClickLat = 0;
 let lastClickLng = 0;
 let hasLocated = false; // 여기 추가!
 
+const FISH_MARKER_MAP = {
+    "쏨뱅이": "#FF0000",     // 🔴
+    "붉바리": "#FF6600",     // 🟠
+    "볼락": "#8B4513",       // 🟤
+    "농어": "#0066FF",       // 🔵
+    "무늬": "#FFD700",       // 🟡
+    "플랫피쉬": "#00AA00",   // 🟢
+    "회유성": "#9932CC",     // 🟣
+    "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", 
+    "기본": "#808080"        // 회색
+};
+
+// 마커 사이즈 및 규격 정의
+const MARKER_WIDTH = 24;
+const MARKER_HEIGHT = 35;
+const OFFSET_X = 12;
+const OFFSET_Y = 35;
+
 
 // =================================================================
 // 🗺️ 카카오 지도 생성 및 하이브리드 위성 세팅
@@ -153,23 +171,7 @@ const FISH_MARKER_MAP2 = {
     "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png" // 추가
 };
 
-const FISH_MARKER_MAP = {
-    "쏨뱅이": "#FF0000",     // 🔴
-    "붉바리": "#FF6600",     // 🟠
-    "볼락": "#8B4513",       // 🟤
-    "농어": "#0066FF",       // 🔵
-    "무늬": "#FFD700",       // 🟡
-    "플랫피쉬": "#00AA00",   // 🟢
-    "회유성": "#9932CC",     // 🟣
-    "내위치": "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", 
-    "기본": "#808080"        // 회색
-};
 
-// 마커 사이즈 및 규격 정의
-const MARKER_WIDTH = 24;
-const MARKER_HEIGHT = 35;
-const OFFSET_X = 12;
-const OFFSET_Y = 35;
 
 // =================================================================
 // 📍 포인트 등록 모드 토글 함수
