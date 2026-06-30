@@ -1176,7 +1176,7 @@ async function getAllTideData(lat,lng, date,time) {
     const station = findNearest(lat, lng, stations);
     console.log("가장 가까운 관측소:", station.name, `(${station.lat}, ${station.lot}, ${station.distance})`);
     const tideData = await getTideData(station.code, date,time);
-
+    console.log(tideData);
     return tideData;
 };
 
