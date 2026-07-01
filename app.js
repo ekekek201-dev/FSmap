@@ -802,7 +802,7 @@ function openListSidebar() {
     
     for (let i = 0; i < sortedPoints.length; i++) {
         const pt = sortedPoints[i];     
-        //<div class="list-item-coords">🌐 좌표: ${pt.coords}</div>
+        console.log(pt);
         htmlContent += `
             <div class="list-item" style="border-left-color: #dc2626;">
                 <div class="list-item-title">🐟 ${pt.fish} (${pt.address})</div>                
