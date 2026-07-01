@@ -1182,7 +1182,10 @@ async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
     if(station_temp.type == "api_a") {
-        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);        
+        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
+        if(tideData_temp == null){
+            console.log("수온값 null");  
+        };
         return {temp: tideData_temp,
                distance: station_temp.distance};
         
