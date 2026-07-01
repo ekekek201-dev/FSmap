@@ -750,7 +750,7 @@ async function saveFishingPoint() {
         formData.date,
         formData.time
     );
-    
+    console.log(file);
     if (currentInfoWindow) currentInfoWindow.close();
     if (currentMarker) currentMarker.setMap(null); 
 
@@ -1244,11 +1244,20 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     console.log(time);
     for (let i = 0; i < 3; i++) {        
         try{
+            let tideData_temp = null;
             let code = station_temp[i].code;
-            console.log(file_date[code]);
-            let nearest_time_chk = nearest_time(file_date[code],time);
-            console.log("code,nearest_time_chk",code,nearest_time_chk);
-            console.log("nearest_time_chk.temp",nearest_time_chk.temp);
+            
+            let tideData_temp = nearest_time(file_date[code],time);
+            console.log("code,tideData_temp",code,tideData_temp);
+            console.log("tideData_temp.temp",tideData_temp.temp);
+            
+            if (tideData_temp != null) {                    
+                    return {
+                        temp: tideData_temp,
+                        //distance: station_temp[i].distance
+                        distance: `${Math.round(station_temp[i].distance)}km`
+                    };
+            }  
             
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
