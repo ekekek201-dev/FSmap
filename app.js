@@ -796,9 +796,13 @@ function openListSidebar() {
     }
 
     let htmlContent = "";
-    for (let i = fishingPointsDataset.length - 1; i >= 0; i--) {
-        const pt = fishingPointsDataset[i];
-        console.log(pt);
+    const sortedPoints = [...fishingPointsDataset].sort(
+    (a, b) => b.date.localeCompare(a.date)
+    );
+    
+    for (let i = 0; i < sortedPoints.length; i++) {
+        const pt = sortedPoints[i];
+        console.log(pt.date);
         htmlContent += `
             <div class="list-item" style="border-left-color: #dc2626;">
                 <div class="list-item-title">🐟 ${pt.fish} 포인트 (${pt.address})</div>
