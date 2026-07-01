@@ -159,7 +159,7 @@ function getMultte(dateStr, lunarData) {
 
 const multte = getMultte('2026-06-05', lunarData);
 
-console.log(multte + '물');
+
 
 
 const FISH_MARKER_MAP2 = {
@@ -683,7 +683,7 @@ async function savePointToFirebase(point) {
 
         point.firebaseId = docRef.id;
 
-        console.log("Firebase 저장 완료:", docRef.id);
+        
 
     } catch(error) {
 
@@ -1170,38 +1170,27 @@ function findNearestSorted(lat, lng, stations) {
 
 async function getAllTideData(lat,lng, date,time) {
     
-    const station = findNearest(lat, lng, stations);
-    console.log("가장 가까운 관측소:", station.name, `(${station.lat}, ${station.lot}, ${station.distance})`);
+    const station = findNearest(lat, lng, stations);    
     const tideData = await getTideData(station.code, date,time);
-    tideData.distance = station.distance;
-    console.log(tideData);
+    tideData.distance = station.distance;    
     return tideData;
 };
 
 async function getAllTideData_temp_api(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp_api);    
     //const station_temp = findNearest(lat, lng, stations_temp);
-    console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
     
     for (let i = 0; i < 3; i++) {
-        try{
-            console.log("관측소(수온):",station_temp[i].name,station_temp[i].code)
-            
-            let tideData_temp = null;
-            
+        try{                       
+            let tideData_temp = null;            
             if(station_temp[i].type == "api_a") {
-                tideData_temp = await getWaterTemp_a(station_temp[i].code, date,time);
-                          
+                tideData_temp = await getWaterTemp_a(station_temp[i].code, date,time);                          
             } else if(station_temp[i].type == "api_b") {
-                tideData_temp = await getWaterTemp_b(station_temp[i].code, date,time);        
-                
+                tideData_temp = await getWaterTemp_b(station_temp[i].code, date,time);                 
             } else if(station_temp[i].type == "api_c") {
-                tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);    
-                
-            }
-                
-            if (tideData_temp != null) {
-                    console.log("리턴");
+                tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);                
+            }                
+            if (tideData_temp != null) {                    
                     return {
                         temp: tideData_temp,
                         //distance: station_temp[i].distance
@@ -1243,8 +1232,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
             try{
                 let tideData_temp = null;
                 let code = station_temp[i].code;                
-                tideData_temp = nearest_time(file_date[code],time);
-                console.log(tideData_temp.temp,station_temp[i].type,station_temp[i].code,station_temp[i].name);                
+                tideData_temp = nearest_time(file_date[code],time);              
                 if (tideData_temp.temp != null) {                    
                         return {
                             temp: tideData_temp.temp,
