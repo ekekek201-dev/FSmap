@@ -801,12 +801,11 @@ function openListSidebar() {
     );
     
     for (let i = 0; i < sortedPoints.length; i++) {
-        const pt = sortedPoints[i];
-        console.log(pt.date);
+        const pt = sortedPoints[i];     
+        //<div class="list-item-coords">🌐 좌표: ${pt.coords}</div>
         htmlContent += `
             <div class="list-item" style="border-left-color: #dc2626;">
-                <div class="list-item-title">🐟 ${pt.fish} 포인트 (${pt.address})</div>
-                <div class="list-item-coords">🌐 좌표: ${pt.coords}</div>
+                <div class="list-item-title">🐟 ${pt.fish} 포인트 (${pt.address})</div>                
                 <div class="list-item-grid">
                     <div><b>📅 날짜:</b> ${pt.date}</div>
                     <div style="color:#007BFF;"><b>🌊 수심:</b> ${pt.depth}</div>
