@@ -823,7 +823,7 @@ function openListSidebar() {
     
     for (let i = 0; i < sortedPoints.length; i++) {
         const pt = sortedPoints[i];     
-        console.log(pt);
+        
         htmlContent += `
                 <div class="list-item"
                      data-coords="${pt.coords}"
