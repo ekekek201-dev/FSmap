@@ -1241,16 +1241,11 @@ async function loadTempData(dateStr) {
 async function getAllTideData_temp_new(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = await loadTempData(date);
-    console.log(station_temp);
-    console.log(file_date);
     
-    for (let i = 0; i < 3; i++) {
-        
-        
-        
+    for (let i = 0; i < 3; i++) {        
         try{
             let code = station_temp[i].code;
-            console.log(file_date[code],file_date[code]);
+            console.log(file_date[code]);
             
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
