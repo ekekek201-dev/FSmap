@@ -1247,7 +1247,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
             
             if (tideData_temp != null) {                    
                     return {
-                        temp: tideData_temp,
+                        temp: tideData_temp.temp,
                         //distance: station_temp[i].distance
                         distance: `${Math.round(station_temp[i].distance)}km`
                     };
