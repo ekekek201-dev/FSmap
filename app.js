@@ -1202,7 +1202,8 @@ async function getAllTideData_temp(lat,lng, date,time) {
                     console.log("리턴");
                     return {
                         temp: tideData_temp,
-                        distance: station_temp[i].distance
+                        //distance: station_temp[i].distance
+                        distance: `${Math.round(station_temp[i].distance)}km`
                     };
             }
                     
