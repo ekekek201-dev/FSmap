@@ -1182,7 +1182,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);    
     //const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
-
+    console.log(date);
     for (let i = 0; i < 3; i++) {
         try{
             let tideData_temp = null;
@@ -1205,8 +1205,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
                         //distance: station_temp[i].distance
                         distance: `${Math.round(station_temp[i].distance)}km`
                     };
-            }
-                    
+            }                    
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
             continue;
@@ -1214,4 +1213,33 @@ async function getAllTideData_temp(lat,lng, date,time) {
 }};
 
 
+async function loadTempData(dateStr) {
 
+    const [yyyy, mm] = dateStr.split('-');
+
+    const url =
+        `./data/temp/${yyyy}/${mm}/${dateStr}.json`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`파일 없음: ${url}`);
+    }
+
+    return await response.json();
+}
+
+
+async function getAllTideData_temp_new(lat,lng, date,time) {
+    const station_temp = findNearestSorted(lat, lng, stations_temp);  
+    console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
+    
+
+
+
+
+
+
+
+
+    
