@@ -783,6 +783,10 @@ function cancelFishingPoint() {
     //alert("등록이 취소되었습니다.");
 }
 
+function getFishColor(fishName) {
+    return FISH_MARKER_MAP[fishName] || FISH_MARKER_MAP["기본"];
+}
+
 function openListSidebar() {
     const sidebar = document.getElementById('list-sidebar');
     const listBox = document.getElementById('list-box-content');
@@ -804,7 +808,7 @@ function openListSidebar() {
         const pt = sortedPoints[i];     
         console.log(pt);
         htmlContent += `
-            <div class="list-item" style="border-left-color: #dc2626;">
+            <div class="list-item" style="border-left-color: ${getFishColor(pt.fish)};">
                 <div class="list-item-title">🐟 ${pt.fish} (${pt.address})</div>                
                 <div class="list-item-grid">
                     <div><b>📅 날짜:</b> ${pt.date}</div>
