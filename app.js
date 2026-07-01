@@ -1197,6 +1197,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
         }
             
         if (tideData_temp != null) {
+                console.log("리턴");
                 return {
                     temp: tideData_temp,
                     distance: station_temp[i].distance
