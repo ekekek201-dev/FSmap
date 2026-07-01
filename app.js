@@ -1241,12 +1241,13 @@ async function loadTempData(dateStr) {
 async function getAllTideData_temp_new(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = await loadTempData(date);
-    
+    console.log(time);
     for (let i = 0; i < 3; i++) {        
         try{
             let code = station_temp[i].code;
             console.log(file_date[code]);
-            
+            let nearest_time = nearest_time(code,time);
+            console.log(nearest_time);
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
             continue;
@@ -1257,6 +1258,23 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     
 }
 
+
+function nearest_time(tempList, currentTime) {
+    const [curHour, curMin] = currentTime.split(':').map(Number);
+    const currentMinutes = curHour * 60 + curMin;
+    let nearest = null;
+    let minDiff = Infinity;
+    for (const item of tempList) {
+        const [hour, min] = item.time.split(':').map(Number);
+        const itemMinutes = hour * 60 + min;
+        const diff = Math.abs(itemMinutes - currentMinutes);
+        if (diff < minDiff) {
+            minDiff = diff;
+            nearest = item;
+        }
+    }
+    return nearest;
+}
 
 
 
