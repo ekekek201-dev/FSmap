@@ -816,9 +816,6 @@ function openListSidebar() {
                     <div><b>🌊 물때:</b> ${pt.tide}</div>
                     <div><b>🌡️ 수온:</b> ${pt.temp}</div>
                 </div>
-                <div style="font-size:11px; color:#666; margin-top:6px; border-top:1px dashed #eee; padding-top:4px;">
-                    <b>📝 메모:</b> ${pt.memo}
-                </div>
             </div>
         `;
     }
