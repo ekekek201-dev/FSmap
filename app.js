@@ -805,7 +805,7 @@ function openListSidebar() {
         //<div class="list-item-coords">🌐 좌표: ${pt.coords}</div>
         htmlContent += `
             <div class="list-item" style="border-left-color: #dc2626;">
-                <div class="list-item-title">🐟 ${pt.fish} 포인트 (${pt.address})</div>                
+                <div class="list-item-title">🐟 ${pt.fish} (${pt.address})</div>                
                 <div class="list-item-grid">
                     <div><b>📅 날짜:</b> ${pt.date}</div>
                     <div style="color:#007BFF;"><b>🌊 수심:</b> ${pt.depth}</div>
