@@ -1182,23 +1182,31 @@ async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);    
     //const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
-    
-    if(station_temp.type == "api_a") {
-        const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
-        return {temp: tideData_temp,
-               distance: station_temp.distance};
-        
-    } else if(station_temp.type == "api_b") {
-        const tideData_temp = await getWaterTemp_b(station_temp.code, date,time);        
-        return {temp: tideData_temp,
-               distance: station_temp.distance};
-        
-    } else if(station_temp.type == "api_c") {
-        const tideData_temp = await getWaterTemp_c(station_temp.code, date,time);        
-        return {temp: tideData_temp,
-               distance: station_temp.distance};
-    }
-};
+
+    for (let i = 0; i < 3; i++) {
+        try{
+        if(station_temp[i].type == "api_a") {
+            const tideData_temp = await getWaterTemp_a(station_temp[i].code, date,time);
+            
+        } else if(station_temp[i].type == "api_b") {
+            const tideData_temp = await getWaterTemp_b(station_temp[i].code, date,time);        
+            
+        } else if(station_temp[i].type == "api_c") {
+            const tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);        
+        }
+            
+        if (tideData_temp != null) {
+                return {
+                    temp: tideData_temp,
+                    distance: station_temp[i].distance
+                };
+        }
+                    
+        }catch(err){
+            console.log(`실패 (${station_temp[i].name})`, err.message);
+            continue;
+        }
+}};
 
 
 
