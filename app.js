@@ -1144,27 +1144,28 @@ function findNearest(lat, lng, stations) {
 };
 }
 
-function findNearest_bak(lat, lng,stations) {
-    
-    if (stations.length === 0) {
+function findNearestSorted(lat, lng, stations) {
+
+    if (!stations.length) {
         console.error("아직 관측소 데이터가 로드되지 않았습니다!");
-        return null;
+        return [];
     }
-    
-    let minDistance = Infinity;
-    let nearest = null;
 
-    stations.forEach(s => {
-        const dx = parseFloat(s.lat) - lat;
-        const dy = parseFloat(s.lot) - lng;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+    return stations
+        .map(s => {
+            const distance = getDistance(
+                lat,
+                lng,
+                parseFloat(s.lat),
+                parseFloat(s.lot)
+            );
 
-        if (distance < minDistance) {
-            minDistance = distance;
-            nearest = s;
-        }
-    });
-    return nearest;
+            return {
+                ...s,
+                distance
+            };
+        })
+        .sort((a, b) => a.distance - b.distance);
 }
 
 async function getAllTideData(lat,lng, date,time) {
@@ -1178,9 +1179,11 @@ async function getAllTideData(lat,lng, date,time) {
 };
 
 async function getAllTideData_temp(lat,lng, date,time) {
-    
+    const test = findNearestSorted(lat, lng, stations_temp);
+    console.log(test);
     const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
+    
     if(station_temp.type == "api_a") {
         const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
         return {temp: tideData_temp,
