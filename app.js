@@ -1187,12 +1187,13 @@ async function getAllTideData_temp(lat,lng, date,time) {
         try{
         if(station_temp[i].type == "api_a") {
             const tideData_temp = await getWaterTemp_a(station_temp[i].code, date,time);
-            
+            console.log(tideData_temp);            
         } else if(station_temp[i].type == "api_b") {
             const tideData_temp = await getWaterTemp_b(station_temp[i].code, date,time);        
-            
+            console.log(tideData_temp);
         } else if(station_temp[i].type == "api_c") {
-            const tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);        
+            const tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);    
+            console.log(tideData_temp);
         }
             
         if (tideData_temp != null) {
