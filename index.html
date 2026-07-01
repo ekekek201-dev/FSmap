@@ -79,26 +79,7 @@
         .btn-submit { background-color: #16a34a; color: white; } 
         .btn-cancel { background-color: #9ca3af; color: white; } 
 
-        /* 🗂️ 등록 리스트 슬라이드 팝업창 디자인 */
-        @media (max-width: 600px) {
 
-        .list-layer {
-            width: 100%;            
-            height: 85vh;   /* ⭐ 핵심 */
-            top: auto;
-            bottom: 0;
-            
-            border-radius: 16px 16px 0 0;
-        }
-    
-        .list-layer.open {
-            right: 0;
-        }
-    
-        .list-content {
-            padding-bottom: 120px; /* 하단 가림 방지 */
-        }
-    }
         
         .list-layer {
             position: fixed;
@@ -107,7 +88,7 @@
         
             width: 360px;
             max-width: 90vw;
-            height: 100vh;
+            height: 85vh;
         
             background-color: #fff;
             z-index: 1000;
@@ -123,6 +104,9 @@
         
         .list-layer.open {
             transform: translateX(0);
+        }
+        .list-content {
+            padding-bottom: 120px; /* 하단 가림 방지 */
         }
         .list-header { padding: 20px; background-color: #1e3a8a; color: white; display: flex; justify-content: space-between; align-items: center; }
         .list-header h3 { margin: 0; font-size: 18px; }
