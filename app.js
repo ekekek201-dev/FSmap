@@ -1243,7 +1243,18 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     let file_date = await loadTempData(date);
     console.log(station_temp);
     console.log(file_date);
-    console.log(file_date.station_temp[1]);
+    
+    for (let i = 0; i < 3; i++) {
+        try{
+            console.log(file_date.station_temp[i]);
+            
+        }catch(err){
+            continue;
+        }
+        
+    }
+
+    
 }
 
 
