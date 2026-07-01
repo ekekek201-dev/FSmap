@@ -798,6 +798,7 @@ function openListSidebar() {
     let htmlContent = "";
     for (let i = fishingPointsDataset.length - 1; i >= 0; i--) {
         const pt = fishingPointsDataset[i];
+        console.log(pt);
         htmlContent += `
             <div class="list-item" style="border-left-color: #dc2626;">
                 <div class="list-item-title">🐟 ${pt.fish} 포인트 (${pt.address})</div>
