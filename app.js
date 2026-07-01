@@ -1191,17 +1191,19 @@ async function getAllTideData_temp(lat,lng, date,time) {
     
     for (let i = 0; i < 3; i++) {
         try{
+            console.log("관측소(수온):",station_temp[i].name,station_temp[i].code)
+            
             let tideData_temp = null;
             
             if(station_temp[i].type == "api_a") {
                 tideData_temp = await getWaterTemp_a(station_temp[i].code, date,time);
-                console.log(tideData_temp);            
+                          
             } else if(station_temp[i].type == "api_b") {
                 tideData_temp = await getWaterTemp_b(station_temp[i].code, date,time);        
-                console.log(tideData_temp);
+                
             } else if(station_temp[i].type == "api_c") {
                 tideData_temp = await getWaterTemp_c(station_temp[i].code, date,time);    
-                console.log(tideData_temp);
+                
             }
                 
             if (tideData_temp != null) {
@@ -1239,7 +1241,7 @@ async function loadTempData(dateStr) {
 async function getAllTideData_temp_new(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = await loadTempData(date);
-    console.log(file_date);
+    console.log(station_temp);
     console.log(file_date.station_temp[0]);
 }
 
