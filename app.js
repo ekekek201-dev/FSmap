@@ -812,7 +812,7 @@ function openListSidebar() {
                 <div class="list-item-title">🐟 ${pt.fish} (${pt.address})</div>                
                 <div class="list-item-grid">
                     <div><b>📅 날짜:</b> ${pt.date}</div>
-                    <div style="color:#007BFF;"><b>🌊 수심:</b> ${pt.depth}</div>
+                    <div><b>📅 시간:</b> ${pt.time}</div>
                     <div><b>🌊 물때:</b> ${pt.tide}</div>
                     <div><b>🌡️ 수온:</b> ${pt.temp}</div>
                 </div>
