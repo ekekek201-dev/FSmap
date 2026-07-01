@@ -1182,7 +1182,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);    
     //const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
-    
+    let file = getAllTideData_temp_new(lat, lng, date, time); 
     for (let i = 0; i < 3; i++) {
         try{
             let tideData_temp = null;
@@ -1234,7 +1234,6 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = loadTempData(date);
     console.log(file_date);
-    
 }
 
 
