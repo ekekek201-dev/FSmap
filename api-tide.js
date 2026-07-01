@@ -45,8 +45,7 @@ async function getTideItems(obsCode, reqDate) {
                 items = data.body.items.item;
 
                 tideCache[cacheKey] = items;
-            }
-            console.log("조석 API 호출 성공");
+            }            
             return items;
 
         } catch (e) {
@@ -111,7 +110,7 @@ async function getTideData(obsCode, reqDate, time) {
         getNearestTide(items, reqDate, time);
 
     // nextTide가 없으면 다음날 조회
-    if (tideInfo.nextTide === null) {
+    if (tideInfo.nextTide === null) {       
 
         const tomorrow = new Date(reqDate);
         tomorrow.setDate(tomorrow.getDate() + 1);
