@@ -1207,7 +1207,7 @@ async function getAllTideData_temp_bak(lat,lng, date,time) {
                         //distance: station_temp[i].distance
                         distance: `${Math.round(station_temp[i].distance)}km`
                     };
-            }                    
+            }else{console.log("수온null");};                
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
             continue;
