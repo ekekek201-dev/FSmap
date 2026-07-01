@@ -1247,7 +1247,7 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     for (let i = 0; i < 3; i++) {
         try{
             let code = station_temp[i].code;
-            console.log(file_date.[station_temp[i].code],file_date.[station_temp[i].name]);
+            console.log(file_date[code],file_date[code]);
             
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
