@@ -1246,7 +1246,7 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
         try{
             let code = station_temp[i].code;
             console.log(file_date[code]);
-            let nearest_time = nearest_time(code,time);
+            let nearest_time_chk = nearest_time(file_date[code],time);
             console.log(nearest_time);
         }catch(err){
             console.log(`실패 (${station_temp[i].name})`, err.message);
