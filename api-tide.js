@@ -46,7 +46,7 @@ async function getTideItems(obsCode, reqDate) {
 
                 tideCache[cacheKey] = items;
             }
-
+            console.log("조석 API 호출 성공");
             return items;
 
         } catch (e) {
