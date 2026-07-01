@@ -127,6 +127,8 @@ document
     .getElementById("list-close-btn")
     .addEventListener("click", closeListSidebar);
 
+
+
 document
     .getElementById("depth-btn")
     .addEventListener("click", updateDepthMap);
@@ -787,6 +789,21 @@ function getFishColor(fishName) {
     return FISH_MARKER_MAP[fishName] || FISH_MARKER_MAP["기본"];
 }
 
+function moveToPoint(coords) {
+    const [lat, lng] = coords.split(',').map(Number);
+
+    const moveLatLng = new kakao.maps.LatLng(lat, lng);
+
+    map.panTo(moveLatLng); // 부드럽게 이동
+}
+
+document.addEventListener("click", (e) => {
+    const item = e.target.closest(".list-item");
+    if (!item) return;
+
+    moveToPoint(item.dataset.coords);
+});
+
 function openListSidebar() {
     const sidebar = document.getElementById('list-sidebar');
     const listBox = document.getElementById('list-box-content');
@@ -808,16 +825,22 @@ function openListSidebar() {
         const pt = sortedPoints[i];     
         console.log(pt);
         htmlContent += `
-            <div class="list-item" style="border-left-color: ${getFishColor(pt.fish)};">
-                <div class="list-item-title">🐟 ${pt.fish} (${pt.address})</div>                
-                <div class="list-item-grid">
-                    <div><b>📅 날짜:</b> ${pt.date}</div>
-                    <div><b>📅 시간:</b> ${pt.time}</div>
-                    <div><b>🌊 물때:</b> ${pt.tide}</div>
-                    <div><b>🌡️ 수온:</b> ${pt.temp}</div>
+                <div class="list-item"
+                     data-coords="${pt.coords}"
+                     style="border-left: 4px solid ${getFishColor(pt.fish)};">
+            
+                    <div class="list-item-title">
+                        🐟 ${pt.fish} (${pt.address})
+                    </div>
+            
+                    <div class="list-item-grid">
+                        <div><b>📅 날짜:</b> ${pt.date}</div>
+                        <div><b>📅 시간:</b> ${pt.time}</div>
+                        <div><b>🌊 물때:</b> ${pt.tide}</div>
+                        <div><b>🌡️ 수온:</b> ${pt.temp}</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
     }
     listBox.innerHTML = htmlContent;
 }
