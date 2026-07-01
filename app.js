@@ -30,7 +30,7 @@ const loader =
 
 loader.classList.add('show');
 let stations = await loadStations('./data/area.json');
-//let stations_temp = await loadStations('./data/temp-area-a.json');
+let stations_temp_api = await loadStations('./data/temp-area-a.json');
 let stations_temp = await loadStations('./data/temp-allarea.json');
 loader.classList.remove('show');
 
@@ -1178,7 +1178,7 @@ async function getAllTideData(lat,lng, date,time) {
     return tideData;
 };
 
-async function getAllTideData_temp_bak(lat,lng, date,time) {
+async function getAllTideData_temp_api(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);    
     //const station_temp = findNearest(lat, lng, stations_temp);
     console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
@@ -1225,7 +1225,8 @@ async function loadTempData(dateStr) {
     const response = await fetch(url);
 
     if (!response.ok) {
-        throw new Error(`파일 없음: ${url}`);
+        console.log(`파일 없음: ${url}`);
+        return null;
     }
 
     return await response.json();
@@ -1235,31 +1236,28 @@ async function loadTempData(dateStr) {
 async function getAllTideData_temp(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = await loadTempData(date);
-    console.log(time);
-    for (let i = 0; i < 3; i++) {        
-        try{
-            let tideData_temp = null;
-            let code = station_temp[i].code;
-            
-            tideData_temp = nearest_time(file_date[code],time);
-            console.log(tideData_temp.temp,station_temp[i].type,station_temp[i].code,station_temp[i].name);
-            
-            if (tideData_temp.temp != null) {                    
-                    return {
-                        temp: tideData_temp.temp,
-                        //distance: station_temp[i].distance
-                        distance: `${Math.round(station_temp[i].distance)}km`
-                    };
-            }  
-            
-        }catch(err){
-            console.log(`실패 (${station_temp[i].name})`, err.message);
-            continue;
+    if(file_date == null){
+        return await getAllTideData_temp_api(lat,lng, date,time);        
+    }else{
+        for (let i = 0; i < 3; i++) {        
+            try{
+                let tideData_temp = null;
+                let code = station_temp[i].code;                
+                tideData_temp = nearest_time(file_date[code],time);
+                console.log(tideData_temp.temp,station_temp[i].type,station_temp[i].code,station_temp[i].name);                
+                if (tideData_temp.temp != null) {                    
+                        return {
+                            temp: tideData_temp.temp,
+                            //distance: station_temp[i].distance
+                            distance: `${Math.round(station_temp[i].distance)}km`
+                        };
+                }                 
+            }catch(err){
+                console.log(`실패 (${station_temp[i].name})`, err.message);
+                continue;
+            }            
         }
-        
     }
-
-    
 }
 
 
