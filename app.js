@@ -1244,7 +1244,7 @@ async function getAllTideData_temp(lat,lng, date,time) {
             tideData_temp = nearest_time(file_date[code],time);
             console.log(tideData_temp.temp,station_temp[i].type,station_temp[i].code,station_temp[i].name);
             
-            if (tideData_temp != null) {                    
+            if (tideData_temp.temp != null) {                    
                     return {
                         temp: tideData_temp.temp,
                         //distance: station_temp[i].distance
