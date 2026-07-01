@@ -1179,10 +1179,9 @@ async function getAllTideData(lat,lng, date,time) {
 };
 
 async function getAllTideData_temp(lat,lng, date,time) {
-    const test = findNearestSorted(lat, lng, stations_temp);
-    console.log(test);
-    const station_temp = findNearest(lat, lng, stations_temp);
-    console.log("가까운 관측소(수온):", station_temp.name, `(${station_temp.lat}, ${station_temp.lot}, ${station_temp.type}, ${station_temp.distance})`);
+    const station_temp = findNearestSorted(lat, lng, stations_temp);    
+    //const station_temp = findNearest(lat, lng, stations_temp);
+    console.log("가까운 관측소(수온):", station_temp[0].name, `(${station_temp[0].lat}, ${station_temp[0].lot}, ${station_temp[0].type}, ${station_temp[0].distance})`);
     
     if(station_temp.type == "api_a") {
         const tideData_temp = await getWaterTemp_a(station_temp.code, date,time);
