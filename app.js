@@ -1240,7 +1240,7 @@ async function getAllTideData_temp_new(lat,lng, date,time) {
     const station_temp = findNearestSorted(lat, lng, stations_temp);  
     let file_date = await loadTempData(date);
     console.log(file_date);
-    console.log(file_date.DT_0001);
+    console.log(file_date.station_temp[0]);
 }
 
 
