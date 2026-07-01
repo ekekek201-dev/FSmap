@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>낚데이터 ver.1.2 어종별 맞춤 마커판</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background-color: #f5f6f7; }
+        #map { width: 100%; height: 100%; z-index: 1; }
+
+        /* 🔐 비밀번호 문지기 화면 */
+        .gate-container {
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; background-color: #111827;
+            color: white; position: absolute; top: 0; left: 0; z-index: 9999;
+            transition: all 0.3s ease;
+        }
+        .gate-container h2 { color: #3b82f6; margin-bottom: 10px; font-size: 24px; }
+        .gate-container p { color: #9ca3af; margin-bottom: 25px; font-size: 14px; }
+        .gate-container input {
+            padding: 14px; font-size: 18px; border-radius: 8px; border: 2px solid #374151;
+            margin-bottom: 15px; width: 220px; text-align: center; background-color: #1f2937; color: white;
+            outline: none; letter-spacing: 5px;
+        }
+        .error-text { color: #ef4444; margin-top: 15px; font-size: 14px; font-weight: bold; display: none; }
+        .gate-container button { padding: 12px 40px; font-size: 16px; background-color: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* 화면 정중앙 조준경 스타일 */
+        .center-pointer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; display: none; }
+        .crosshair { position: relative; width: 30px; height: 30px; }
+        .crosshair::before { content: ''; position: absolute; top: 14px; left: 0; width: 30px; height: 2px; background: #dc2626; }
+        .crosshair::after { content: ''; position: absolute; top: 0; left: 14px; width: 2px; height: 30px; background: #dc2626; }
+        .crosshair-dot { position: absolute; top: 12px; left: 12px; width: 6px; height: 6px; background: #dc2626; border-radius: 50%; }
+        
+        /* 하단 메뉴 바 스타일 조정 */
+        .menu-container {
+            position: absolute; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 10; 
+            display: flex; 
+            gap: 6px; /* 10px에서 6px로 줄여서 여유 공간 확보 */
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 8px 12px; /* 패딩을 살짝 줄임 */
+            border-radius: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            max-width: 95%; /* 더 넓게 활용 */
+            overflow-x: auto; 
+            white-space: nowrap;  
+        }
+        
+        .menu-btn { 
+            background-color: #1e3a8a; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; /* 버튼 좌우 패딩을 조금 줄임 */
+            border-radius: 20px; 
+            font-size: 13px; /* 폰트 크기를 살짝 줄여 버튼 4개가 잘 들어가게 함 */
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        /* 마커 옆에 뜰 입력창 팝업 스타일 */
+        .info-form { padding: 10px; font-size: 12px; width: 330px; line-height: 1.6; color: #333; }
+        .info-form h4 { margin: 0 0 8px 0; color: #1e3a8a; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: center; position: relative; }
+        .info-row span { font-weight: bold; color: #555; }
+        .info-row input, .info-row select { width: 235px; border: 1px solid #ccc; padding: 3px 4px; border-radius: 4px; font-size: 11px; box-sizing: border-box; }
+        .info-row input[readonly] { background-color: #eee; border: 1px solid #ddd; } 
+        
+        /* 🐟 하이브리드 어종 입력 콤보 세트 스타일 */
+        .fish-combo-box { display: flex; width: 235px; gap: 2px; }
+        .fish-combo-box input { flex: 1; }
+        .fish-combo-box select { width: 85px !important; background: #f1f5f9; }
+
+        .btn-group { display: flex; gap: 6px; margin-top: 10px; justify-content: flex-end; }
+        .form-btn { border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-submit { background-color: #16a34a; color: white; } 
+        .btn-cancel { background-color: #9ca3af; color: white; } 
+
+        /* 🗂️ 등록 리스트 슬라이드 팝업창 디자인 */
+        .list-layer {
+            position: absolute; top: 0; right: -400px; width: 360px; height: 100%;
+            background-color: #ffffff; z-index: 1000; box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            transition: right 0.3s ease; display: flex; flex-direction: column;
+        }
+        .list-layer.open { right: 0; } 
+        .list-header { padding: 20px; background-color: #1e3a8a; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .list-header h3 { margin: 0; font-size: 18px; }
+        .list-close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .list-content { flex: 1; padding: 15px; overflow-y: auto; background-color: #f3f4f6; }
+        .list-item { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #1e3a8a; }
+        .list-item-title { font-weight: bold; color: #111; margin-bottom: 4px; font-size: 14px; }
+        .list-item-coords { font-size: 11px; color: #007BFF; margin-bottom: 6px; }
+        .list-item-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 12px; color: #555; background: #fafafa; padding: 6px; border-radius: 4px; }
+
+        /* 🌊 바다 위 전자해도풍 수심 숫자 스타일 디자인 */
+        .sea-depth-number {
+            font-size: 12px; font-weight: 800; color: #0f172a; background: rgba(255, 255, 255, 0.50);
+            padding: 1px 4px; border-radius: 3px; border: 1px solid #94a3b8;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.2); font-family: monospace; text-shadow: 0px 0px 2px white;
+        }
+        .fish-label {
+            /* background: rgba(255, 255, 255, 0.8); */
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+
+            color: white;
+
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px  1px 0 #000,
+                1px  1px 0 #000;
+
+            /* border: 1px solid #ccc; */
+
+            white-space: nowrap;
+        }
+        
+        #fish-legend {
+    position: absolute;
+
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%);
+
+    z-index: 100;
+
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 20px;
+
+    padding: 6px 12px;
+
+    color: #333;
+    font-size: 11px;
+    font-weight: bold;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+    white-space: nowrap;
+}
+        
+
+
+        /* ⏳ 전체화면 암전 로딩레이어 디자인 */
+        .loading-layer {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(15, 23, 42, 0.75); z-index: 5000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; font-weight: bold; font-size: 16px; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .loading-layer.show { opacity: 1; pointer-events: auto; }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #3b82f6; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+
+
+    <div id="loading-screen" class="loading-layer">
+        <div class="spinner"></div>
+        <div id="loading-text">🌊 로딩중...</div>
+    </div>
+
+    <div id="pointer" class="center-pointer">
+        <div class="crosshair"><div class="crosshair-dot"></div></div>
+    </div>
+
+    <div id="list-sidebar" class="list-layer">
+        <div class="list-header">
+            <h3>🗂️ 출조 포인트 리스트</h3>
+            <button id="list-close-btn" class="list-close-btn">×</button>
+        </div>
+        <div id="list-box-content" class="list-content">
+            <p style="text-align:center; color:#888; margin-top:30px;">등록된 포인트가 없습니다.<br>지도에서 포인트를 등록해보세요!</p>
+        </div>
+    </div>
+
+    <div id="menu-bar" class="menu-container" style="display: flex;">
+        <button id="reg-btn" class="menu-btn">📍 포인트 등록</button>
+        <button id="my-loc-btn" class="menu-btn">🎯 현재 위치</button> 
+        <button id="list-btn" class="menu-btn">🗂️ 등록 리스트</button>
+        <button id="depth-btn" class="menu-btn">🌊 수심확인</button>
+    </div>
+
+    <div id="fish-legend">
+    🔴 쏨뱅이
+    🟠 붉바리
+    🟤 볼락
+    🔵 농어    
+    🟡 무늬
+    🟢 플랫피쉬
+    🟣 회유성
+    </div>
+
+    <div id="map"></div>
+
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2376548a7cabae898e561523454feed1&libraries=services"></script>
+    <script src="api-depth.js"></script>
+    <script src="api-tide.js"></script>
+    <script type="module" src="app.js"></script>
+
+
+
+</body>
+</html>
