@@ -164,7 +164,7 @@ async function getTideData(obsCode, reqDate, time) {
 
 
 async function getWaterTemp_a(obsCode, reqDate, time) {
-
+    console.log(obsCode, reqDate, time);
     const req = reqDate.replaceAll('-', '');
     const cacheKey = `${obsCode}_${reqDate}`;
     const API_KEY =
@@ -328,6 +328,59 @@ async function getWaterTemp_c(obsCode, time) {
             delete tideCache_temp[cacheKey];
             console.error(
                 `수온 조회 실패 (${attempt}/3):`,
+                e
+            );
+            if (attempt === 3) {
+                return null;
+            }
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
+        }
+    }
+}
+
+async function get_weather(lat,lot, reqDate, time) {    
+    const cacheKey = `${obsCode}_${reqDate}`;
+    const url =
+        `https://archive-api.open-meteo.com/v1/archive?` +
+        `latitude=${lat}&longitude=${lot}&start_date=${reqDate}&end_date=${reqDate}` +
+        `&hourly=temperature_2m,wind_speed_10m,wind_direction_10m&wind_speed_unit=ms&timezone=Asia/Seoul`;    
+          
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            let items;            
+            if (attempt === 1 && tideCache_temp[cacheKey]) {
+                console.log('날씨 캐시 사용');
+                items = tideCache_temp[cacheKey];
+            } else {
+                console.log(`날씨 API 호출 (${attempt}/3)`);
+                const response = await fetch(url);
+                const data = await response.json();
+                const { time, temperature_2m, wind_speed_10m, wind_direction_10m } = data.hourly;
+                const weatherList = time.map((t, i) => ({
+                    time: t.replace('T'," "),            
+                    temperature: temperature_2m[i],
+                    windSpeed: wind_speed_10m[i],
+                    windDirection: wind_direction_10m[i]
+                    }));
+                if (!weatherList?.length) {
+                    throw new Error('날씨 데이터 없음');
+                }               
+                tideCache_temp[cacheKey] = weatherList;
+            }
+
+
+            return return {
+                                temperature,
+                                windSpeed,
+                                windDirection
+                            };
+            
+        } catch (e) {
+            delete tideCache_temp[cacheKey];
+            console.error(
+                `날씨 조회 실패 (${attempt}/3):`,
                 e
             );
             if (attempt === 3) {
