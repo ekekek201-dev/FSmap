@@ -523,7 +523,8 @@ function getWindArrow(degree) {
     }
 
     const arrows = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
-    const index = Math.round((((degree % 360) + 360) % 360) / 45) % 8;
+    const direction = (Number(degree) + 180) % 360;
+    const index = Math.round(direction / 45) % 8;
 
     return arrows[index];
 }
