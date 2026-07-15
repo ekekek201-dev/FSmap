@@ -684,9 +684,9 @@ async function savePointToFirebase(point) {
 
             tackle: point.tackle,
             memo: point.memo,
-            weather_temp: point.temperature,
-            wind_speed: point.windSpeed,
-            wind_direction : point.windDirection
+            weather_temp: point.weather_temp,
+            wind_speed: point.wind_speed,
+            wind_direction : point.wind_direction
         };
 
         const docRef = await addDoc(
