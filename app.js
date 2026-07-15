@@ -657,7 +657,7 @@ function attachMarkerClickEvent(marker, point) {
 }
 
 async function savePointToFirebase(point) {
-
+    console.log(point);
     try {
 
         const saveData = {
