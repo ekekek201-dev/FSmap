@@ -549,6 +549,11 @@ function attachMarkerClickEvent(marker, point) {
                     <span style="font-size:11px;">${point.address}</span>
                 </div>
 
+                <div class="info-row">
+                    <span>날씨</span>
+                    <span style="font-size:11px;">${point.address}</span>
+                </div>
+                
                 <!--
                 <div class="info-row">
                     <span>좌표</span>
