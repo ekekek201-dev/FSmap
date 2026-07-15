@@ -341,7 +341,7 @@ async function getWaterTemp_c(obsCode, time) {
 }
 
 async function get_weather(lat,lot, reqDate, time) {    
-    const cacheKey = `${obsCode}_${reqDate}`;
+    const cacheKey = `${reqDate}_${time}`;
     const url =
         `https://archive-api.open-meteo.com/v1/archive?` +
         `latitude=${lat}&longitude=${lot}&start_date=${reqDate}&end_date=${reqDate}` +
