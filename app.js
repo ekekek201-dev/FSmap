@@ -517,6 +517,17 @@ function showDepthData(lat, lng) {
     );
 }
 
+function getWindArrow(degree) {
+    if (typeof degree !== 'number' || Number.isNaN(degree)) {
+        return '-';   // 또는 '❓', '·', ''
+    }
+
+    const arrows = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+    const index = Math.round((((degree % 360) + 360) % 360) / 45) % 8;
+
+    return arrows[index];
+}
+
 function attachMarkerClickEvent(marker, point) {
 
     kakao.maps.event.addListener(marker, 'click', function() {
@@ -554,7 +565,7 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>날씨</span>
-                    <span style="font-size:11px;">${point.weather_temp}℃ ${point.wind_speed}m/s ${point.wind_direction}</span>
+                    <span style="font-size:11px;">${point.weather_temp}℃ ${point.wind_speed}m/s ${{getWindArrow(point.wind_direction)}}</span>
                 </div>
                 
                 <!--
