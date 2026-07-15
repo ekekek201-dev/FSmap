@@ -359,7 +359,7 @@ async function get_weather(lat,lot, reqDate, time) {
                 const data = await response.json();
                 const { time, temperature_2m, wind_speed_10m, wind_direction_10m } = data.hourly;
                 const weatherList = time.map((t, i) => ({
-                    time: t.replace('T'," "),            
+                    time: t,            
                     temperature: temperature_2m[i],
                     windSpeed: wind_speed_10m[i],
                     windDirection: wind_direction_10m[i]
@@ -370,12 +370,20 @@ async function get_weather(lat,lot, reqDate, time) {
                 tideCache_temp[cacheKey] = weatherList;
             }
 
+             const target = new Date(`${reqDate}T${targetTime}`);
+            let nearest = weatherList[0];
+            let minDiff = Infinity;
 
-            return {
-                                temperature,
-                                windSpeed,
-                                windDirection
-                            };
+             for (const item of weatherList) {
+                const diff = Math.abs(new Date(item.time) - target);
+                 
+                 if (diff < minDiff) {
+                    minDiff = diff;
+                    nearest = item;
+                }
+            }
+            
+            return nearest;
             
         } catch (e) {
             delete tideCache_temp[cacheKey];
