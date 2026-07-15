@@ -554,7 +554,7 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>날씨</span>
-                    <span style="font-size:11px;">${point.weather_temp}</span>
+                    <span style="font-size:11px;">${point.weather_temp}${point.wind_speed}${point.wind_direction}</span>
                 </div>
                 
                 <!--
