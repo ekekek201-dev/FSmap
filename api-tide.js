@@ -371,7 +371,7 @@ async function get_weather(lat,lot, reqDate, time) {
             }
 
 
-            return return {
+            return {
                                 temperature,
                                 windSpeed,
                                 windDirection
