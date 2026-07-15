@@ -353,13 +353,13 @@ async function get_weather(lat,lot, reqDate, targetTime) {
             let items;            
             if (attempt === 1 && tideCache_temp[cacheKey]) {
                 console.log('날씨 캐시 사용');
-                items = tideCache_temp[cacheKey];
+                weatherList  = tideCache_temp[cacheKey];
             } else {
                 console.log(`날씨 API 호출 (${attempt}/3)`);
                 const response = await fetch(url);
                 const data = await response.json();
                 const { time, temperature_2m, wind_speed_10m, wind_direction_10m } = data.hourly;
-                const weatherList = time.map((t, i) => ({
+                weatherList = time.map((t, i) => ({
                     time: t,            
                     temperature: temperature_2m[i],
                     windSpeed: wind_speed_10m[i],
