@@ -752,6 +752,13 @@ async function saveFishingPoint() {
         formData.time
     );
 
+    const weather = await get_weather(
+            lastClickLat,
+            lastClickLng,
+            formData.date,
+            formData.time
+        );
+    console.log(weather);
     if (currentInfoWindow) currentInfoWindow.close();
     if (currentMarker) currentMarker.setMap(null); 
 
