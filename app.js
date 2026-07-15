@@ -404,7 +404,7 @@ function createFishingMarker_png(fishName, position) {
     return { marker, label };
 }
 
-function createFishingPointData(formData, marker,tideData,tideData_temp) {
+function createFishingPointData(formData, marker,tideData,tideData_temp,weather_info) {
     //const tideData = await getAllTideData(37.123, 126.456, '20260605');
     return {
         id: Date.now(),
@@ -424,7 +424,10 @@ function createFishingPointData(formData, marker,tideData,tideData_temp) {
         fish: formData.fish,
         tackle: formData.tackle || "미입력",
         memo: formData.memo || "미입력",
-        markerRef: marker
+        markerRef: marker,
+        weather_temp: weather_info.temperature|| "조회실패",
+        wind_speed: weather_info.windSpeed|| "조회실패",
+        wind_direction : weather_info.windDirection|| "조회실패"
     };
 }
 
@@ -551,7 +554,7 @@ function attachMarkerClickEvent(marker, point) {
 
                 <div class="info-row">
                     <span>날씨</span>
-                    <span style="font-size:11px;">${point.address}</span>
+                    <span style="font-size:11px;">${point.weather_temp}</span>
                 </div>
                 
                 <!--
@@ -680,7 +683,10 @@ async function savePointToFirebase(point) {
             fish: point.fish,
 
             tackle: point.tackle,
-            memo: point.memo
+            memo: point.memo,
+            weather_temp: point.temperature,
+            wind_speed: point.windSpeed,
+            wind_direction : point.windDirection
         };
 
         const docRef = await addDoc(
@@ -768,7 +774,8 @@ async function saveFishingPoint() {
         formData,
         markerObj.marker,
         tideData,
-        tideData_temp
+        tideData_temp,
+        weather
     );
     newPoint.labelRef = markerObj.label;
     
